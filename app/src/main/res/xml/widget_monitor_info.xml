@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 갱신은 MonitorService가 1초마다 직접 한다 (updatePeriodMillis 미사용) -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_monitor_description"
+    android:initialLayout="@layout/widget_monitor"
+    android:previewLayout="@layout/widget_monitor"
+    android:minWidth="180dp"
+    android:minHeight="180dp"
+    android:minResizeWidth="150dp"
+    android:minResizeHeight="150dp"
+    android:targetCellWidth="3"
+    android:targetCellHeight="3"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

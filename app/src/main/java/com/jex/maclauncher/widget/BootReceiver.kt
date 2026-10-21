@@ -1,0 +1,13 @@
+package com.jex.maclauncher.widget
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+
+/** 재부팅/앱 업데이트 후 위젯 갱신을 다시 시작 */
+class BootReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        CalendarWidget.updateAll(context)
+        if (MonitorWidget.hasWidgets(context)) MonitorService.start(context)
+    }
+}

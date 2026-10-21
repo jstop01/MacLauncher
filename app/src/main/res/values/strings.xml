@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Mac 위젯</string>
+    <string name="widget_monitor_title">시스템 모니터</string>
+    <string name="widget_monitor_hint">탭하면 실시간 갱신 시작</string>
+    <string name="widget_monitor_description">CPU · 메모리를 1초마다 보여주는 macOS 스타일 위젯</string>
+    <string name="widget_memory">메모리</string>
+    <string name="widget_calendar_title">달력</string>
+    <string name="widget_calendar_description">macOS 스타일 월간 달력</string>
+</resources>
