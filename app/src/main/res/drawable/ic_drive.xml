@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Macintosh HD 드라이브 아이콘 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
+    <path android:fillColor="#D8D8DC" android:pathData="M6,14 Q6,11 9,11 L39,11 Q42,11 42,14 L42,34 Q42,37 39,37 L9,37 Q6,37 6,34 Z" />
+    <path android:fillColor="#A9A9AF" android:pathData="M6,29 L42,29 L42,34 Q42,37 39,37 L9,37 Q6,37 6,34 Z" />
+    <path android:fillColor="#30D158" android:pathData="M36,33 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+</vector>

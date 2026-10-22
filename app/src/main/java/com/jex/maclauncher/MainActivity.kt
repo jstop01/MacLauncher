@@ -42,6 +42,7 @@ import com.jex.maclauncher.ui.theme.MacLauncherTheme
 import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
+import com.jex.maclauncher.widget.StorageWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
                     onAddFinder = { pin(FinderWidget::class.java) },
                     onAddDock = ::pinDock,
                     onEditDock = ::editDock,
+                    onAddStorage = { pin(StorageWidget::class.java) },
                 )
             }
         }
@@ -73,6 +75,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         FinderWidget.refreshAll(this)
+        StorageWidget.refreshAll(this)
     }
 
     /** Dock은 홈에 놓이자마자 앱 고르기 화면을 띄움 (런처가 새 위젯 id를 채워서 불러줌) */
@@ -107,7 +110,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit) {
+private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit) {
     // 실시간 갱신 알림을 보이려면 Android 13+에서 알림 권한 필요 (거부해도 위젯은 동작)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) {
@@ -156,6 +159,12 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
                 detail = "자주 쓰는 앱을 골라 Mac Dock처럼 한 줄로 놓고 탭해서 실행해요. 추가하면 바로 앱 고르기 화면이 뜨고, 나중에 '앱 고르기'로 바꿀 수 있어요.",
                 onAdd = onAddDock,
                 secondary = "앱 고르기" to onEditDock,
+            )
+            Spacer(Modifier.height(12.dp))
+            WidgetCard(
+                title = "저장 공간",
+                detail = "Mac의 'Macintosh HD'처럼 앱 · 사진 · 동영상 · 음악 · 문서별 사용량을 색 막대로 보여줘요. 탭하면 새로고침 (항목별 용량은 '모든 파일 접근' 권한 필요).",
+                onAdd = onAddStorage,
             )
             Spacer(Modifier.height(20.dp))
             Text(

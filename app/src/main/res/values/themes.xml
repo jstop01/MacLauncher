@@ -39,6 +39,31 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <!-- 저장 공간 위젯 범례 -->
+    <style name="StorageRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="StorageLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="StorageValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#99FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <!-- 위젯 클릭을 받아 바로 끝나는 중간 액티비티 (화면 안 보임) -->
     <style name="Theme.MacLauncher.Trampoline" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
