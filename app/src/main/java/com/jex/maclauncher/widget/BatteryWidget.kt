@@ -116,6 +116,7 @@ class BatteryWidget : AppWidgetProvider() {
             if (!hasBluetoothPermission(context)) return emptyList()
             val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter ?: return emptyList()
             if (!adapter.isEnabled) return emptyList()
+            // 버즈 같은 LE 오디오 기기는 왼쪽/오른쪽 등 주소 여러 개로 잡혀서 이름이 같으면 하나로
             return runCatching { adapter.bondedDevices }.getOrNull().orEmpty().mapNotNull { device ->
                 val level = runCatching {
                     HiddenApiBypass.invoke(BluetoothDevice::class.java, device, "getBatteryLevel") as Int
@@ -126,8 +127,11 @@ class BatteryWidget : AppWidgetProvider() {
                     BluetoothClass.Device.Major.WEARABLE -> R.drawable.ic_bat_watch
                     else -> R.drawable.ic_bat_device
                 }
-                Battery(icon, level)
-            }.take(SLOTS.size - 1)
+                Battery(icon, level) to (runCatching { device.name }.getOrNull() ?: device.address)
+            }
+                .groupBy({ it.second }, { it.first })
+                .map { (_, same) -> same.maxBy { it.level } }
+                .take(SLOTS.size - 1)
         }
     }
 }

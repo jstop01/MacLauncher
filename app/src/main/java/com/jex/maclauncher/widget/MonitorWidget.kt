@@ -79,6 +79,16 @@ class MonitorWidget : AppWidgetProvider() {
                     )
                 }
                 setOnClickPendingIntent(R.id.mon_root, click)
+                // 메모리 줄은 메모리 정리 화면으로 (갱신 중일 때만, 아니면 전체가 '갱신 시작')
+                if (MonitorService.running) {
+                    setOnClickPendingIntent(
+                        R.id.mon_mem_row,
+                        PendingIntent.getActivity(
+                            context, 2, SystemShortcuts.memory(context),
+                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                        ),
+                    )
+                }
             }
         }
 

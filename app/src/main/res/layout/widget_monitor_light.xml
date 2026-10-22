@@ -88,8 +88,9 @@
         android:layout_height="1dp"
         android:src="@drawable/widget_divider_light" />
 
-    <!-- 메모리: 사용량 + 그래프 -->
+    <!-- 메모리: 사용량 + 그래프 (탭하면 메모리 정리) -->
     <LinearLayout
+        android:id="@+id/mon_mem_row"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

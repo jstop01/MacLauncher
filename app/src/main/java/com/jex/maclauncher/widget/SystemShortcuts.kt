@@ -22,6 +22,14 @@ object SystemShortcuts {
         Intent(Settings.ACTION_SETTINGS),
     )
 
+    /** 시스템 모니터 메모리 줄 → 삼성 디바이스 케어 메모리 정리 */
+    fun memory(context: Context): Intent = first(
+        context,
+        Intent("com.samsung.android.sm.ACTION_RAM").setPackage(DEVICE_CARE),
+        Intent("com.samsung.android.sm.ACTION_DASHBOARD").setPackage(DEVICE_CARE),
+        Intent(Settings.ACTION_SETTINGS),
+    )
+
     /** 저장 공간 → 삼성 저장공간 화면 (없으면 안드로이드 저장소 설정) */
     fun storage(context: Context): Intent = first(
         context,
