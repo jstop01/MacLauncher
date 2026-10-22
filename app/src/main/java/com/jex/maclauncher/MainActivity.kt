@@ -37,6 +37,7 @@ import com.jex.maclauncher.ui.theme.MacLauncherTheme
 import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
+import com.jex.maclauncher.widget.finder.FinderWidget
 
 private val Panel = Color(0xFF1E1E20)
 private val Sub = Color(0x99FFFFFF)
@@ -53,9 +54,16 @@ class MainActivity : ComponentActivity() {
                 WidgetGuide(
                     onAddMonitor = { pin(MonitorWidget::class.java) },
                     onAddCalendar = { pin(CalendarWidget::class.java) },
+                    onAddFinder = { pin(FinderWidget::class.java) },
                 )
             }
         }
+    }
+
+    // '모든 파일 접근'을 켜고 돌아왔을 수 있으니 Finder 위젯 새로고침
+    override fun onResume() {
+        super.onResume()
+        FinderWidget.refreshAll(this)
     }
 
     /** One UI는 "홈 화면에 추가" 확인 창을 띄워준다 */
@@ -65,7 +73,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit) {
+private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit) {
     // 실시간 갱신 알림을 보이려면 Android 13+에서 알림 권한 필요 (거부해도 위젯은 동작)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) {
@@ -101,6 +109,12 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit) {
                 title = "달력",
                 detail = "◀ ▶로 달을 넘기고, 년·월을 누르면 이번 달로 돌아와요. 날짜를 누르면 캘린더 앱이 열립니다.",
                 onAdd = onAddCalendar,
+            )
+            Spacer(Modifier.height(12.dp))
+            WidgetCard(
+                title = "Finder",
+                detail = "폴더를 탭하면 위젯 안에서 들어가고, 파일을 탭하면 바로 열려요. 처음 한 번 '모든 파일 접근' 권한을 켜야 합니다 (위젯을 탭하면 설정으로 이동).",
+                onAdd = onAddFinder,
             )
             Spacer(Modifier.height(20.dp))
             Text(

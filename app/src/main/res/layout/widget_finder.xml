@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS Finder 창 모양 위젯: 제목 막대 / 사이드바 + 파일 격자 / 상태 막대 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <!-- 제목 막대: 신호등 · ◀ · 폴더 이름 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="4dp" android:src="@drawable/dot_red" />
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="7dp" android:src="@drawable/dot_yellow" />
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="7dp" android:src="@drawable/dot_green" />
+
+        <TextView
+            android:id="@+id/finder_back"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:text="‹"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/finder_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- 제목을 가운데 두려고 왼쪽 신호등+◀ 폭만큼 비워둠 -->
+        <TextView
+            android:id="@+id/finder_refresh"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="40dp"
+            android:gravity="center"
+            android:text="⟳"
+            android:textColor="#99FFFFFF"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/widget_divider" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <!-- 사이드바 -->
+        <LinearLayout
+            android:layout_width="112dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/finder_sidebar_bg"
+            android:orientation="vertical"
+            android:padding="6dp">
+
+            <TextView style="@style/FinderSideHeader" android:text="즐겨찾기" />
+            <TextView
+                android:id="@+id/side_recent"
+                style="@style/FinderSideItem"
+                android:text="최근 항목" />
+            <TextView
+                android:id="@+id/side_download"
+                style="@style/FinderSideItem"
+                android:text="다운로드" />
+            <TextView
+                android:id="@+id/side_documents"
+                style="@style/FinderSideItem"
+                android:text="문서" />
+            <TextView
+                android:id="@+id/side_photos"
+                style="@style/FinderSideItem"
+                android:text="사진" />
+            <TextView
+                android:id="@+id/side_music"
+                style="@style/FinderSideItem"
+                android:text="음악" />
+            <TextView
+                android:id="@+id/side_movies"
+                style="@style/FinderSideItem"
+                android:text="동영상" />
+
+            <TextView style="@style/FinderSideHeader" android:layout_marginTop="6dp" android:text="위치" />
+            <TextView
+                android:id="@+id/side_phone"
+                style="@style/FinderSideItem"
+                android:text="내 폰" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1">
+
+            <GridView
+                android:id="@+id/finder_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:columnWidth="76dp"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="4dp" />
+
+            <TextView
+                android:id="@+id/finder_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="항목 없음"
+                android:textColor="#66FFFFFF"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/finder_permission"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="파일을 보려면 '모든 파일 접근' 권한이 필요해요\n\n탭해서 허용하기"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/finder_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textColor="#99FFFFFF"
+        android:textSize="11sp" />
+</LinearLayout>
