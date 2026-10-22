@@ -65,8 +65,14 @@ class FinderOpenActivity : Activity() {
     }
 
     private fun requestAccess(widgetId: Int) {
-        if (FinderFiles.hasAccess(this)) {
+        val location = FinderWidget.location(this, widgetId)
+        if (FinderFiles.canShow(this, location)) {
             FinderWidget.refresh(this, widgetId)
+        } else if (location == FinderFiles.RECENT_APPS) {
+            startActivity(
+                Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS, Uri.parse("package:$packageName"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // 별도 태스크로: 같은 태스크에 남으면 다음 위젯 탭 때 설정 화면이 다시 앞으로 나온다
             startActivity(

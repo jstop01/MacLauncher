@@ -46,5 +46,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons)
+    // 배터리 위젯: 블루투스 기기 배터리(BluetoothDevice.getBatteryLevel, 숨은 API) 읽기
+    implementation(libs.hiddenapibypass)
     debugImplementation(libs.androidx.ui.tooling)
 }

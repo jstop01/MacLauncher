@@ -5,6 +5,7 @@ import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -56,11 +57,35 @@ private val Sub = Color(0x99FFFFFF)
 
 /** 위젯을 홈 화면에 추가하는 안내 화면 */
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        private const val EXTRA_REQUEST_BLUETOOTH = "request_bluetooth"
+
+        /** 배터리 위젯 탭 → 근처 기기(블루투스) 권한 요청 */
+        fun requestBluetoothIntent(context: Context): Intent =
+            Intent(context, MainActivity::class.java).putExtra(EXTRA_REQUEST_BLUETOOTH, true)
+    }
+
+    private val bluetoothOnly = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        BatteryWidget.updateAll(this)
+    }
+
+    private fun handleBluetoothRequest(intent: Intent) {
+        if (intent.getBooleanExtra(EXTRA_REQUEST_BLUETOOTH, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            bluetoothOnly.launch(Manifest.permission.BLUETOOTH_CONNECT)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleBluetoothRequest(intent)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // 앱 화면(포그라운드)에서는 서비스 시작이 항상 허용됨
         if (MonitorWidget.hasWidgets(this)) MonitorService.start(this)
+        handleBluetoothRequest(intent)
         setContent {
             MacLauncherTheme {
                 WidgetGuide(

@@ -39,6 +39,11 @@ class FinderItemsService : RemoteViewsService() {
             entries = when {
                 location == FinderFiles.APPS ->
                     AppCatalog.list(context, AppCatalog.Section.ALL).map { Entry.AppEntry(it.packageName, it.label) }
+                // 이름 아래에 마지막으로 쓴 시각
+                location == FinderFiles.RECENT_APPS -> RecentApps.list(context).mapNotNull { used ->
+                    (apps(listOf(used.packageName)).firstOrNull() as? Entry.AppEntry)
+                        ?.let { it.copy(label = "${it.label}\n${RecentApps.ago(used.lastUsed)}") }
+                }
                 // 즐겨찾기 맨 위: 폴더 → 앱 → ＋
                 location == FinderFiles.FAVORITES -> {
                     val fav = FavoritesStore.load(context)

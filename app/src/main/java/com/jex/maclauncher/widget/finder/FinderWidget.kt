@@ -69,8 +69,8 @@ class FinderWidget : AppWidgetProvider() {
         fun refresh(context: Context, id: Int) {
             val manager = AppWidgetManager.getInstance(context)
             val location = location(context, id)
-            // 앱 목록은 파일 권한이 필요 없음
-            val access = FinderFiles.isAppLocation(location) || FinderFiles.hasAccess(context)
+            // 앱 목록은 파일 권한이 필요 없고, 최근 사용 앱은 사용 정보 접근 권한이 필요
+            val access = FinderFiles.canShow(context, location)
             val views = RemoteViews(context.packageName, R.layout.widget_finder)
 
             views.setTextViewText(R.id.finder_title, FinderFiles.title(context, location))
@@ -101,6 +101,7 @@ class FinderWidget : AppWidgetProvider() {
                     R.id.finder_footer,
                     when {
                         location == FinderFiles.APPS -> "${AppCatalog.list(context, AppCatalog.Section.ALL).size}개 앱"
+                        location == FinderFiles.RECENT_APPS -> "최근 7일 · ⟳ 로 새로고침"
                         FinderFiles.isAppLocation(location) -> "즐겨찾기 · ＋ 로 편집"
                         else -> FinderFiles.freeSpace()
                     },
@@ -109,6 +110,11 @@ class FinderWidget : AppWidgetProvider() {
                 views.setViewVisibility(R.id.finder_grid, View.GONE)
                 views.setViewVisibility(R.id.finder_empty, View.GONE)
                 views.setViewVisibility(R.id.finder_permission, View.VISIBLE)
+                views.setTextViewText(
+                    R.id.finder_permission,
+                    if (location == FinderFiles.RECENT_APPS) "최근 사용 앱을 보려면 '사용 정보 접근' 권한이 필요해요\n\n탭해서 허용하기"
+                    else "파일을 보려면 '모든 파일 접근' 권한이 필요해요\n\n탭해서 허용하기",
+                )
                 views.setOnClickPendingIntent(R.id.finder_permission, FinderOpenActivity.permission(context, id))
                 views.setTextViewText(R.id.finder_footer, "")
             }

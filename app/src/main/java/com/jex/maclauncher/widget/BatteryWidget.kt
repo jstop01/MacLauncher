@@ -18,7 +18,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
+import com.jex.maclauncher.MainActivity
 import com.jex.maclauncher.R
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 /** macOS 배터리 위젯: 폰 + 배터리를 알려주는 연결된 블루투스 기기(최대 3) */
 class BatteryWidget : AppWidgetProvider() {
@@ -69,13 +71,21 @@ class BatteryWidget : AppWidgetProvider() {
                 views.setImageViewResource(ICONS[i], b.icon)
                 views.setTextViewText(LEVELS[i], (if (b.charging) "⚡" else "") + "${b.level}%")
             }
-            views.setOnClickPendingIntent(
-                R.id.bat_root,
+            // 블루투스 권한이 없으면 안내를 보이고, 탭하면 앱에서 권한 요청 (권한 창은 액티비티에서만 띄울 수 있음)
+            val needsPermission = !hasBluetoothPermission(context)
+            if (!small) views.setViewVisibility(R.id.bat_hint, if (needsPermission) View.VISIBLE else View.GONE)
+            val click = if (needsPermission) {
+                PendingIntent.getActivity(
+                    context, 1, MainActivity.requestBluetoothIntent(context),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+            } else {
                 PendingIntent.getBroadcast(
                     context, 0, Intent(context, BatteryWidget::class.java).setAction(ACTION_REFRESH),
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-                ),
-            )
+                )
+            }
+            views.setOnClickPendingIntent(R.id.bat_root, click)
             return views
         }
 
@@ -91,19 +101,24 @@ class BatteryWidget : AppWidgetProvider() {
             )
         }
 
+        private fun hasBluetoothPermission(context: Context) =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+
         /**
-         * 연결된 블루투스 기기 배터리. BluetoothDevice.getBatteryLevel()이 숨은 API라 리플렉션으로 읽고,
-         * 기기가 배터리를 안 알려주거나(-1) 막혀 있으면 빠진다.
+         * 연결된 블루투스 기기 배터리. BluetoothDevice.getBatteryLevel()은 숨은 API이고
+         * targetSdk 31+ 앱에선 리플렉션도 막혀 있어서 HiddenApiBypass로 호출한다.
+         * 기기가 배터리를 안 알려주면(-1) 빠진다.
          */
         @SuppressLint("MissingPermission")
         private fun bluetooth(context: Context): List<Battery> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
-            ) return emptyList()
+            if (!hasBluetoothPermission(context)) return emptyList()
             val adapter = context.getSystemService(BluetoothManager::class.java)?.adapter ?: return emptyList()
             if (!adapter.isEnabled) return emptyList()
             return runCatching { adapter.bondedDevices }.getOrNull().orEmpty().mapNotNull { device ->
-                val level = runCatching { device.javaClass.getMethod("getBatteryLevel").invoke(device) as Int }.getOrDefault(-1)
+                val level = runCatching {
+                    HiddenApiBypass.invoke(BluetoothDevice::class.java, device, "getBatteryLevel") as Int
+                }.getOrDefault(-1)
                 if (level < 0) return@mapNotNull null
                 val icon = when (device.bluetoothClass?.majorDeviceClass) {
                     BluetoothClass.Device.Major.AUDIO_VIDEO -> R.drawable.ic_bat_headphones

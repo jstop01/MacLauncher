@@ -24,6 +24,8 @@ object FinderFiles {
     /** 응용 프로그램: 파일 대신 설치된 앱을 보여주는 위치 */
     const val APPS = "apps"
     const val FAVORITES = "favorites"
+    /** 최근 사용 앱 (사용 정보 접근 권한) */
+    const val RECENT_APPS = "recent_apps"
 
     fun favoriteFolder(id: String) = "$FAVORITES/$id"
     fun favoriteFolderId(location: String): String? = location.removePrefix("$FAVORITES/").takeIf { it != location }
@@ -36,6 +38,7 @@ object FinderFiles {
     val sidebar: List<Triple<Int, String, String>>
         get() = listOf(
             Triple(R.id.side_favorites, "즐겨찾는 앱", FAVORITES),
+            Triple(R.id.side_recent_apps, "최근 사용 앱", RECENT_APPS),
             Triple(R.id.side_recent, "최근 항목", RECENT),
             Triple(R.id.side_apps, "응용 프로그램", APPS),
             Triple(R.id.side_download, "다운로드", dir(Environment.DIRECTORY_DOWNLOADS)),
@@ -58,7 +61,15 @@ object FinderFiles {
     }
 
     /** 파일이 아니라 앱/즐겨찾기를 보여주는 위치 (파일 권한 불필요) */
-    fun isAppLocation(location: String) = location == APPS || location == FAVORITES || favoriteFolderId(location) != null
+    fun isAppLocation(location: String) =
+        location == APPS || location == RECENT_APPS || location == FAVORITES || favoriteFolderId(location) != null
+
+    /** 이 위치를 보는 데 필요한 권한이 있는지 */
+    fun canShow(context: Context, location: String): Boolean = when {
+        location == RECENT_APPS -> RecentApps.hasAccess(context)
+        isAppLocation(location) -> true
+        else -> hasAccess(context)
+    }
 
     /** 지금 위치가 속한 사이드바 항목 (가장 깊게 일치하는 것) */
     fun sidebarFor(location: String): Int? =
@@ -68,7 +79,7 @@ object FinderFiles {
     /** 뒤로: 상위 폴더. 최근 항목이나 저장소 맨 위에선 null */
     fun parent(location: String): String? {
         if (favoriteFolderId(location) != null) return FAVORITES
-        if (location == RECENT || location == APPS || location == FAVORITES || location == root.path) return null
+        if (location == RECENT || location == APPS || location == RECENT_APPS || location == FAVORITES || location == root.path) return null
         return File(location).parentFile?.path?.takeIf { it.startsWith(root.path) }
     }
 
