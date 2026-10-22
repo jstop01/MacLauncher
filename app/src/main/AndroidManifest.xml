@@ -137,6 +137,32 @@
         </receiver>
 
         <receiver
+            android:name=".widget.reminders.RemindersWidget"
+            android:exported="false"
+            android:label="@string/widget_reminders_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_reminders_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.reminders.RemindersService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <activity
+            android:name=".widget.reminders.ReminderActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.MacLauncher.Trampoline"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <receiver
             android:name=".widget.BootReceiver"
             android:exported="false">
             <intent-filter>

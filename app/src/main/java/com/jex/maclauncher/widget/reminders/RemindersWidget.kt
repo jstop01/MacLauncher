@@ -1,0 +1,104 @@
+package com.jex.maclauncher.widget.reminders
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.graphics.Paint
+import android.net.Uri
+import android.view.View
+import android.widget.RemoteViews
+import android.widget.RemoteViewsService
+import com.jex.maclauncher.R
+
+/** macOS 미리 알림 위젯: 동그라미 탭 = 완료, 글자 탭 = 수정, + = 추가 */
+class RemindersWidget : AppWidgetProvider() {
+
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        updateAll(context)
+    }
+
+    companion object {
+        fun updateAll(context: Context) {
+            val manager = AppWidgetManager.getInstance(context)
+            val ids = manager.getAppWidgetIds(ComponentName(context, RemindersWidget::class.java))
+            ids.forEach { id ->
+                manager.updateAppWidget(id, views(context, id))
+                manager.notifyAppWidgetViewDataChanged(id, R.id.rem_list)
+            }
+        }
+
+        private fun views(context: Context, id: Int): RemoteViews =
+            RemoteViews(context.packageName, R.layout.widget_reminders).apply {
+                setTextViewText(R.id.rem_count, ReminderStore.remaining(context).toString())
+
+                val done = ReminderStore.completed(context)
+                setViewVisibility(R.id.rem_clear, if (done > 0) View.VISIBLE else View.GONE)
+                setTextViewText(R.id.rem_clear, "완료된 항목 ${done}개 지우기")
+                setOnClickPendingIntent(R.id.rem_clear, action(context, ReminderActivity.ACTION_CLEAR, 1))
+                setOnClickPendingIntent(R.id.rem_add, action(context, ReminderActivity.ACTION_ADD, 2))
+
+                val adapter = Intent(context, RemindersService::class.java)
+                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+                    .setData(Uri.parse("reminders://widget/$id"))
+                setRemoteAdapter(R.id.rem_list, adapter)
+                setEmptyView(R.id.rem_list, R.id.rem_empty)
+                // 항목마다 fill-in으로 동작/id를 채우므로 MUTABLE
+                setPendingIntentTemplate(
+                    R.id.rem_list,
+                    PendingIntent.getActivity(
+                        context, 0, Intent(context, ReminderActivity::class.java),
+                        PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    ),
+                )
+            }
+
+        private fun action(context: Context, action: String, requestCode: Int): PendingIntent =
+            PendingIntent.getActivity(
+                context, requestCode,
+                Intent(context, ReminderActivity::class.java).putExtra(ReminderActivity.EXTRA_ACTION, action),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+    }
+}
+
+/** 미리 알림 목록 항목 */
+class RemindersService : RemoteViewsService() {
+    override fun onGetViewFactory(intent: Intent): RemoteViewsFactory = Factory(applicationContext)
+
+    private class Factory(private val context: Context) : RemoteViewsFactory {
+        private var items: List<Reminder> = emptyList()
+
+        override fun onCreate() = Unit
+        override fun onDataSetChanged() {
+            items = ReminderStore.all(context)
+        }
+        override fun onDestroy() = Unit
+        override fun getCount() = items.size
+
+        override fun getViewAt(position: Int): RemoteViews {
+            val views = RemoteViews(context.packageName, R.layout.widget_reminders_item)
+            val item = items.getOrNull(position) ?: return views
+            views.setTextViewText(R.id.rem_title, item.title)
+            views.setImageViewResource(R.id.rem_check, if (item.done) R.drawable.ic_check_on else R.drawable.ic_check_off)
+            views.setTextColor(R.id.rem_title, if (item.done) 0x80FFFFFF.toInt() else 0xFFFFFFFF.toInt())
+            views.setInt(
+                R.id.rem_title, "setPaintFlags",
+                Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG or (if (item.done) Paint.STRIKE_THRU_TEXT_FLAG else 0),
+            )
+            views.setOnClickFillInIntent(R.id.rem_check, fillIn(ReminderActivity.ACTION_TOGGLE, item.id))
+            views.setOnClickFillInIntent(R.id.rem_title, fillIn(ReminderActivity.ACTION_EDIT, item.id))
+            return views
+        }
+
+        private fun fillIn(action: String, id: Long) =
+            Intent().putExtra(ReminderActivity.EXTRA_ACTION, action).putExtra(ReminderActivity.EXTRA_ID, id)
+
+        override fun getLoadingView(): RemoteViews? = null
+        override fun getViewTypeCount() = 1
+        override fun getItemId(position: Int) = items.getOrNull(position)?.id ?: position.toLong()
+        override fun hasStableIds() = true
+    }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 미리 알림 앱 아이콘 느낌: 파란 원 + 목록 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="28dp" android:height="28dp" android:viewportWidth="28" android:viewportHeight="28">
+    <path android:fillColor="#0A84FF" android:pathData="M14,0 a14,14 0 1,0 0.001,0 Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M8,9 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 M8,14 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 M8,19 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0" />
+    <path android:fillColor="#FFFFFF" android:pathData="M11.5,8.2 L21,8.2 L21,9.8 L11.5,9.8 Z M11.5,13.2 L21,13.2 L21,14.8 L11.5,14.8 Z M11.5,18.2 L21,18.2 L21,19.8 L11.5,19.8 Z" />
+</vector>

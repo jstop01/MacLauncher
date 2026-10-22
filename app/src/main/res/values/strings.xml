@@ -12,4 +12,6 @@
     <string name="widget_dock_description">자주 쓰는 앱을 macOS Dock처럼 늘어놓는 위젯</string>
     <string name="widget_storage_title">저장 공간</string>
     <string name="widget_storage_description">macOS 스타일 저장 공간 사용량 (앱 · 사진 · 동영상 · 음악 · 문서)</string>
+    <string name="widget_reminders_title">미리 알림</string>
+    <string name="widget_reminders_description">위젯에서 바로 체크하고 추가하는 macOS 스타일 할 일 목록</string>
 </resources>

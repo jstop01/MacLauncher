@@ -46,6 +46,7 @@ import com.jex.maclauncher.widget.StorageWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
+import com.jex.maclauncher.widget.reminders.RemindersWidget
 
 private val Panel = Color(0xFF1E1E20)
 private val Sub = Color(0x99FFFFFF)
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
                     onAddDock = ::pinDock,
                     onEditDock = ::editDock,
                     onAddStorage = { pin(StorageWidget::class.java) },
+                    onAddReminders = { pin(RemindersWidget::class.java) },
                 )
             }
         }
@@ -110,7 +112,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit) {
+private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit, onAddReminders: () -> Unit) {
     // 실시간 갱신 알림을 보이려면 Android 13+에서 알림 권한 필요 (거부해도 위젯은 동작)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) {
@@ -165,6 +167,12 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
                 title = "저장 공간",
                 detail = "Mac의 'Macintosh HD'처럼 앱 · 사진 · 동영상 · 음악 · 문서별 사용량을 색 막대로 보여줘요. 탭하면 새로고침 (항목별 용량은 '모든 파일 접근' 권한 필요).",
                 onAdd = onAddStorage,
+            )
+            Spacer(Modifier.height(12.dp))
+            WidgetCard(
+                title = "미리 알림",
+                detail = "동그라미를 탭하면 완료, 글자를 탭하면 수정, + 로 바로 추가해요. 할 일은 폰 안에만 저장됩니다.",
+                onAdd = onAddReminders,
             )
             Spacer(Modifier.height(20.dp))
             Text(
