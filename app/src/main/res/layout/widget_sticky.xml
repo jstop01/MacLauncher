@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS 스티커 메모 (테마와 상관없이 메모지 색 그대로) -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sticky_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/sticky_paper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/sticky_bg" />
+
+    <TextView
+        android:id="@+id/sticky_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ellipsize="end"
+        android:gravity="top|start"
+        android:lineSpacingExtra="3dp"
+        android:padding="16dp"
+        android:textColor="#E6000000"
+        android:textSize="15sp" />
+</FrameLayout>

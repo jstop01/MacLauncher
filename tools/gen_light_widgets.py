@@ -26,6 +26,9 @@ COLORS = [
     ("#FFFFFF", "#1C1C1E"),      # 기본 글씨
 ]
 
+# 테마와 상관없는 위젯 (스티커 메모는 메모지 색 그대로)
+SKIP_LAYOUTS = {"widget_sticky"}
+
 # 라이트 버전이 필요한 드로어블 (흰색/어두운 패널을 쓰는 것만)
 DRAWABLES = [
     "widget_bg", "dock_bg", "finder_sidebar_bg", "finder_side_selected", "widget_divider",
@@ -61,7 +64,10 @@ def with_header(text: str) -> str:
 
 
 def main():
-    layouts = sorted(p for p in (RES / "layout").glob("widget_*.xml") if not p.stem.endswith("_light"))
+    layouts = sorted(
+        p for p in (RES / "layout").glob("widget_*.xml")
+        if not p.stem.endswith("_light") and p.stem not in SKIP_LAYOUTS
+    )
     for p in layouts:
         out = p.with_name(p.stem + "_light.xml")
         out.write_text(with_header(lighten_refs(recolor(p.read_text()))))

@@ -20,4 +20,6 @@
     <string name="widget_apps_description">설치된 앱을 분류별로 둘러보고 바로 실행하는 Finder 위젯</string>
     <string name="widget_clock_title">시계</string>
     <string name="widget_clock_description">macOS 스타일 아날로그 시계, 넓게 놓으면 세계 시계</string>
+    <string name="widget_sticky_title">메모</string>
+    <string name="widget_sticky_description">macOS 스티커처럼 색깔 메모지에 쓰는 메모</string>
 </resources>

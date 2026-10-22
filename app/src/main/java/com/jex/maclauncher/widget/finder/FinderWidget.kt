@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
@@ -62,6 +63,24 @@ class FinderWidget : AppWidgetProvider() {
         private const val ACTION_ZOOM = "com.jex.maclauncher.finder.ZOOM"
         private const val KEY_MINIMIZED = "minimized_"
         private const val KEY_ZOOMED = "zoomed_"
+        private const val KEY_MINI_POSITION = "mini_position"
+
+        /**
+         * 최소화 아이콘 위치: 0~8 (왼쪽 위부터 가로로 3칸씩, 4 = 가운데). 모든 Finder 위젯 공통.
+         * 위젯은 화면 어디에 놓였는지 알 수 없어서 사용자가 고른다.
+         */
+        fun miniPosition(context: Context) = prefs(context).getInt(KEY_MINI_POSITION, 0).coerceIn(0, 8)
+
+        fun setMiniPosition(context: Context, position: Int) {
+            prefs(context).edit().putInt(KEY_MINI_POSITION, position).apply()
+            refreshAll(context)
+        }
+
+        private fun miniGravity(position: Int): Int {
+            val h = when (position % 3) { 0 -> Gravity.START; 1 -> Gravity.CENTER_HORIZONTAL; else -> Gravity.END }
+            val v = when (position / 3) { 0 -> Gravity.TOP; 1 -> Gravity.CENTER_VERTICAL; else -> Gravity.BOTTOM }
+            return h or v
+        }
         private const val EXTRA_LOCATION = "location"
         private const val KEY_LOCATION = "location_"
 
@@ -107,6 +126,8 @@ class FinderWidget : AppWidgetProvider() {
             val windowParts = intArrayOf(R.id.finder_titlebar, R.id.finder_divider, R.id.finder_body, R.id.finder_footer)
             windowParts.forEach { views.setViewVisibility(it, if (minimized) View.GONE else View.VISIBLE) }
             views.setViewVisibility(R.id.finder_mini, if (minimized) View.VISIBLE else View.GONE)
+            // 펼쳐 있을 땐 내용이 꽉 차서 영향 없고, 최소화일 때 아이콘이 9칸 중 어디에 붙을지만 정함
+            views.setInt(R.id.finder_root, "setGravity", miniGravity(miniPosition(context)))
             views.setInt(
                 R.id.finder_root, "setBackgroundResource",
                 if (minimized) 0 else WidgetTheme.drawable(context, R.drawable.widget_bg),

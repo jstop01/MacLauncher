@@ -17,6 +17,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.alpha
+import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
@@ -59,6 +67,7 @@ import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.widget.reminders.RemindersWidget
+import com.jex.maclauncher.widget.sticky.StickyWidget
 
 private val Panel = Color(0xFF1E1E20)
 private val Sub = Color(0x99FFFFFF)
@@ -97,6 +106,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             MacLauncherTheme {
                 WidgetGuide(cards())
+                if (pickingFinderMini) {
+                    MiniPositionPicker(
+                        current = FinderWidget.miniPosition(this),
+                        onPick = {
+                            FinderWidget.setMiniPosition(this, it)
+                            pickingFinderMini = false
+                        },
+                        onDismiss = { pickingFinderMini = false },
+                    )
+                }
             }
         }
     }
@@ -114,6 +133,7 @@ class MainActivity : ComponentActivity() {
         WidgetCardSpec(
             "Finder",
             "폴더를 탭하면 위젯 안에서 들어가고, 파일을 탭하면 바로 열려요. 🟡 최소화, 🟢 최대화. 처음 한 번 '모든 파일 접근' 권한을 켜야 합니다 (위젯을 탭하면 설정으로 이동).",
+            secondary = "아이콘 위치" to { pickingFinderMini = true },
         ) { pin(FinderWidget::class.java) },
         WidgetCardSpec(
             "응용 프로그램",
@@ -146,6 +166,10 @@ class MainActivity : ComponentActivity() {
             "동그라미를 탭하면 완료, 글자를 탭하면 수정, + 로 바로 추가해요. 할 일은 폰 안에만 저장됩니다.",
         ) { pin(RemindersWidget::class.java) },
         WidgetCardSpec(
+            "메모",
+            "Mac 스티커처럼 색깔 메모지에 메모를 써요. 탭하면 수정하고 색(노랑·파랑·초록·분홍·보라·회색)도 바꿀 수 있어요. 여러 개 놓으면 각각 따로 저장돼요.",
+        ) { pin(StickyWidget::class.java) },
+        WidgetCardSpec(
             "배터리",
             "폰과 연결된 블루투스 기기(버즈·워치 등)의 배터리를 링으로 보여줘요. 블루투스 기기는 '근처 기기' 권한이 필요하고, 기기에 따라 배터리를 알려주지 않을 수 있어요.",
         ) {
@@ -154,6 +178,9 @@ class MainActivity : ComponentActivity() {
             else pin(BatteryWidget::class.java)
         },
     )
+
+    /** Finder 🟡 최소화 아이콘 위치 고르기 창 */
+    private var pickingFinderMini by mutableStateOf(false)
 
     // 권한 창과 위젯 추가 창이 겹치지 않게, 권한 응답 뒤에 추가 창을 띄운다 (거부해도 위젯은 추가)
     private var pinAfterGrant: Class<*>? = null
@@ -248,6 +275,52 @@ private fun WidgetGuide(cards: List<WidgetCardSpec>) {
 }
 
 /** 위젯 다크/라이트. 바꾸면 이미 놓인 위젯도 바로 다시 그려짐 */
+/** 최소화 아이콘 위치 9칸 (위젯 모양의 3x3 격자) */
+@Composable
+private fun MiniPositionPicker(current: Int, onPick: (Int) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("최소화 아이콘 위치") },
+        text = {
+            Column {
+                Text("Finder를 🟡로 접었을 때 아이콘이 남을 자리를 골라요. 화면 아래쪽에 놓은 위젯이면 아래 줄을 고르면 위로 열리는 느낌이 나요.", fontSize = 13.sp)
+                Spacer(Modifier.height(16.dp))
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1.3f)
+                        .background(Color(0xFF1E1E20), RoundedCornerShape(16.dp))
+                        .padding(8.dp),
+                ) {
+                    for (row in 0..2) {
+                        Row(Modifier.weight(1f)) {
+                            for (col in 0..2) {
+                                val pos = row * 3 + col
+                                val selected = pos == current
+                                Box(
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .padding(4.dp)
+                                        .background(if (selected) Color(0xFF0A84FF) else Color(0xFF2C2C2E), RoundedCornerShape(10.dp))
+                                        .clickable { onPick(pos) },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Image(
+                                        painterResource(R.drawable.ic_finder_face), contentDescription = null,
+                                        modifier = Modifier.size(28.dp).alpha(if (selected) 1f else 0.35f),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("닫기") } },
+    )
+}
+
 @Composable
 private fun ThemePicker() {
     val context = LocalContext.current
