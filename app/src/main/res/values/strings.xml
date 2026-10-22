@@ -16,4 +16,6 @@
     <string name="widget_reminders_description">위젯에서 바로 체크하고 추가하는 macOS 스타일 할 일 목록</string>
     <string name="widget_battery_title">배터리</string>
     <string name="widget_battery_description">폰과 연결된 블루투스 기기의 배터리를 보여주는 macOS 스타일 위젯</string>
+    <string name="widget_apps_title">응용 프로그램</string>
+    <string name="widget_apps_description">설치된 앱을 분류별로 둘러보고 바로 실행하는 Finder 위젯</string>
 </resources>

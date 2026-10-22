@@ -45,6 +45,7 @@ import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
 import com.jex.maclauncher.widget.StorageWidget
+import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
                     onAddMonitor = { pin(MonitorWidget::class.java) },
                     onAddCalendar = { pin(CalendarWidget::class.java) },
                     onAddFinder = { pin(FinderWidget::class.java) },
+                    onAddApps = { pin(AppsWidget::class.java) },
                     onAddDock = ::pinDock,
                     onEditDock = ::editDock,
                     onAddStorage = { pin(StorageWidget::class.java) },
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         FinderWidget.refreshAll(this)
         StorageWidget.refreshAll(this)
+        AppsWidget.refreshAll(this) // 새로 설치/삭제한 앱 반영
     }
 
     /** 배터리: 블루투스 기기 배터리를 읽으려면 근처 기기 권한 (거부해도 폰 배터리는 표시) */
@@ -128,7 +131,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit, onAddReminders: () -> Unit, onAddBattery: () -> Unit) {
+private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddApps: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit, onAddReminders: () -> Unit, onAddBattery: () -> Unit) {
     // 실시간 갱신 알림을 보이려면 Android 13+에서 알림 권한 필요 (거부해도 위젯은 동작)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) {
@@ -170,6 +173,12 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
                 title = "Finder",
                 detail = "폴더를 탭하면 위젯 안에서 들어가고, 파일을 탭하면 바로 열려요. 처음 한 번 '모든 파일 접근' 권한을 켜야 합니다 (위젯을 탭하면 설정으로 이동).",
                 onAdd = onAddFinder,
+            )
+            Spacer(Modifier.height(12.dp))
+            WidgetCard(
+                title = "응용 프로그램",
+                detail = "앱 전용 Finder예요. 전체 · 최근 설치 · 게임 · 소셜 · 사진·동영상 · 음악 · 생산성으로 나눠 보고 탭해서 실행해요.",
+                onAdd = onAddApps,
             )
             Spacer(Modifier.height(12.dp))
             WidgetCard(
