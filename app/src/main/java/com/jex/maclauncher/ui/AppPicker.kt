@@ -40,7 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.drawable.toBitmap
+import com.jex.maclauncher.widget.MacIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -127,7 +127,7 @@ private fun loadApps(context: Context): List<LaunchableApp> {
             LaunchableApp(
                 packageName = it.activityInfo.packageName,
                 label = it.loadLabel(pm).toString(),
-                icon = it.loadIcon(pm).toBitmap(96, 96).asImageBitmap(),
+                icon = MacIcon.draw(it.loadIcon(pm), 96).asImageBitmap(),
             )
         }
         .sortedBy { it.label.lowercase() }

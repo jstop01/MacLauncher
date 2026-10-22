@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
-import androidx.core.graphics.drawable.toBitmap
+import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
 
 /** macOS Dock 위젯: 고른 앱 아이콘을 한 줄로, 탭하면 실행. 앱 목록은 위젯마다 따로 저장. */
@@ -76,7 +76,7 @@ class DockWidget : AppWidgetProvider() {
             apps(context, id).forEachIndexed { i, pkg ->
                 // 지워진 앱은 건너뜀
                 val launch = pm.getLaunchIntentForPackage(pkg) ?: return@forEachIndexed
-                val icon = runCatching { pm.getApplicationIcon(pkg).toBitmap(ICON_PX, ICON_PX) }.getOrNull() ?: return@forEachIndexed
+                val icon = MacIcon.of(context, pkg, ICON_PX) ?: return@forEachIndexed
                 val item = RemoteViews(context.packageName, R.layout.widget_dock_item)
                 item.setImageViewBitmap(R.id.dock_icon, icon)
                 item.setContentDescription(R.id.dock_icon, pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)))

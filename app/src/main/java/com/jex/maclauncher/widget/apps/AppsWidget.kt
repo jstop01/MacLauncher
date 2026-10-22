@@ -12,7 +12,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import androidx.core.graphics.drawable.toBitmap
+import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.WidgetSize
 
@@ -127,8 +127,7 @@ class AppsItemsService : RemoteViewsService() {
             val views = RemoteViews(context.packageName, R.layout.widget_finder_item)
             val app = apps.getOrNull(position) ?: return views
             views.setTextViewText(R.id.item_name, app.label)
-            runCatching { context.packageManager.getApplicationIcon(app.packageName).toBitmap(112, 112) }
-                .onSuccess { views.setImageViewBitmap(R.id.item_icon, it) }
+            MacIcon.of(context, app.packageName, 112)?.let { views.setImageViewBitmap(R.id.item_icon, it) }
             views.setOnClickFillInIntent(R.id.item_root, Intent().putExtra(AppLaunchActivity.EXTRA_PACKAGE, app.packageName))
             return views
         }

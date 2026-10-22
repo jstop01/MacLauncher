@@ -8,7 +8,7 @@ import android.media.ThumbnailUtils
 import android.util.Size
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import androidx.core.graphics.drawable.toBitmap
+import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.apps.AppCatalog
 
@@ -79,8 +79,7 @@ class FinderItemsService : RemoteViewsService() {
                 }
                 is Entry.AppEntry -> {
                     views.setTextViewText(R.id.item_name, e.label)
-                    runCatching { context.packageManager.getApplicationIcon(e.packageName).toBitmap(112, 112) }
-                        .onSuccess { views.setImageViewBitmap(R.id.item_icon, it) }
+                    MacIcon.of(context, e.packageName, 112)?.let { views.setImageViewBitmap(R.id.item_icon, it) }
                     views.setOnClickFillInIntent(R.id.item_root, Intent().putExtra(FinderOpenActivity.EXTRA_PACKAGE, e.packageName))
                 }
                 is Entry.FolderEntry -> {
