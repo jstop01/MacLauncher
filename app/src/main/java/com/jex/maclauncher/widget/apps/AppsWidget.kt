@@ -14,6 +14,7 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.WidgetSize
 
 /** 앱 전용 Finder: 분류 사이드바 + 앱 격자, 탭하면 실행. 고른 분류는 위젯마다 기억. */
@@ -65,7 +66,7 @@ class AppsWidget : AppWidgetProvider() {
         fun refresh(context: Context, id: Int) {
             val manager = AppWidgetManager.getInstance(context)
             val section = section(context, id)
-            val views = RemoteViews(context.packageName, R.layout.widget_apps)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_apps))
 
             views.setTextViewText(R.id.apps_title, section.title)
             views.setViewVisibility(R.id.apps_back, View.INVISIBLE) // 폴더 계층이 없어서 뒤로 버튼은 안 씀
@@ -75,7 +76,7 @@ class AppsWidget : AppWidgetProvider() {
             val narrow = WidgetSize.of(manager, id).narrowerThan(280)
             views.setViewVisibility(R.id.apps_sidebar, if (narrow) View.GONE else View.VISIBLE)
             AppCatalog.Section.entries.forEachIndexed { i, s ->
-                views.setInt(s.viewId, "setBackgroundResource", if (s == section) R.drawable.finder_side_selected else 0)
+                views.setInt(s.viewId, "setBackgroundResource", if (s == section) WidgetTheme.drawable(context, R.drawable.finder_side_selected) else 0)
                 views.setOnClickPendingIntent(s.viewId, broadcast(context, id, ACTION_SECTION, 1 + i) { putExtra(EXTRA_SECTION, s.name) })
             }
 
@@ -124,7 +125,7 @@ class AppsItemsService : RemoteViewsService() {
         override fun getCount() = apps.size
 
         override fun getViewAt(position: Int): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.widget_finder_item)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
             val app = apps.getOrNull(position) ?: return views
             views.setTextViewText(R.id.item_name, app.label)
             MacIcon.of(context, app.packageName, 112)?.let { views.setImageViewBitmap(R.id.item_icon, it) }
@@ -133,7 +134,7 @@ class AppsItemsService : RemoteViewsService() {
         }
 
         // 기본 "Loading..." 글자 대신 빈 칸
-        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, R.layout.widget_finder_item)
+        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
         override fun getViewTypeCount() = 1
         override fun getItemId(position: Int) = position.toLong()
         override fun hasStableIds() = false

@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 
 /** macOS Dock 위젯: 고른 앱 아이콘을 한 줄로, 탭하면 실행. 앱 목록은 위젯마다 따로 저장. */
 class DockWidget : AppWidgetProvider() {
@@ -69,7 +70,7 @@ class DockWidget : AppWidgetProvider() {
 
         fun update(context: Context, manager: AppWidgetManager, id: Int) {
             val pm = context.packageManager
-            val views = RemoteViews(context.packageName, R.layout.widget_dock)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_dock))
             views.removeAllViews(R.id.dock_icons)
 
             var shown = 0
@@ -77,7 +78,7 @@ class DockWidget : AppWidgetProvider() {
                 // 지워진 앱은 건너뜀
                 val launch = pm.getLaunchIntentForPackage(pkg) ?: return@forEachIndexed
                 val icon = MacIcon.of(context, pkg, ICON_PX) ?: return@forEachIndexed
-                val item = RemoteViews(context.packageName, R.layout.widget_dock_item)
+                val item = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_dock_item))
                 item.setImageViewBitmap(R.id.dock_icon, icon)
                 item.setContentDescription(R.id.dock_icon, pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)))
                 item.setOnClickPendingIntent(

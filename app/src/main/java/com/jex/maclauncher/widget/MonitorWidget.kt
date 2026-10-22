@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -51,15 +52,16 @@ class MonitorWidget : AppWidgetProvider() {
         /** 작으면 CPU 링 + 메모리 숫자만, 크면 그래프까지 */
         private fun views(context: Context, size: WidgetSize): RemoteViews {
             val s = MonitorService.state
+            val p = WidgetTheme.palette(context)
             val small = size.narrowerThan(200) || size.shorterThan(160)
-            val layout = if (small) R.layout.widget_monitor_small else R.layout.widget_monitor
+            val layout = if (small) WidgetTheme.layout(context, R.layout.widget_monitor_small) else WidgetTheme.layout(context, R.layout.widget_monitor)
             return RemoteViews(context.packageName, layout).apply {
-                setImageViewBitmap(R.id.mon_cpu_ring, MonitorGraphics.ring(s.cpu, BLUE))
+                setImageViewBitmap(R.id.mon_cpu_ring, MonitorGraphics.ring(s.cpu, BLUE, p.track))
                 setTextViewText(R.id.mon_cpu_value, "${(s.cpu * 100).roundToInt()}%")
                 setTextViewText(R.id.mon_mem_value, formatMemory(s.mem.usedMb))
                 if (!small) {
-                    setImageViewBitmap(R.id.mon_cpu_graph, MonitorGraphics.graph(s.cpuHistory, MonitorService.HISTORY, BLUE))
-                    setImageViewBitmap(R.id.mon_mem_graph, MonitorGraphics.graph(s.memHistory, MonitorService.HISTORY, GREEN))
+                    setImageViewBitmap(R.id.mon_cpu_graph, MonitorGraphics.graph(s.cpuHistory, MonitorService.HISTORY, BLUE, p.grid))
+                    setImageViewBitmap(R.id.mon_mem_graph, MonitorGraphics.graph(s.memHistory, MonitorService.HISTORY, GREEN, p.grid))
                 }
 
                 // 서비스가 안 돌고 있으면 안내 문구를 보이고, 탭하면 서비스 시작 (사용자 탭은 백그라운드 제한 예외)

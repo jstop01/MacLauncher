@@ -17,6 +17,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +52,7 @@ import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
 import com.jex.maclauncher.widget.StorageWidget
+import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
@@ -181,6 +188,8 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
                 "홈 화면에 macOS 스타일 위젯을 추가하세요. 추가한 뒤에는 길게 눌러 크기를 바꾸거나 옮길 수 있어요.",
                 color = Sub, fontSize = 14.sp,
             )
+            Spacer(Modifier.height(20.dp))
+            ThemePicker()
             Spacer(Modifier.height(24.dp))
             WidgetCard(
                 title = "시스템 모니터",
@@ -235,6 +244,40 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
                 "추가 버튼이 안 되면: 홈 화면 빈 곳을 길게 누르기 → 위젯 → Mac 위젯",
                 color = Sub, fontSize = 12.sp,
             )
+        }
+    }
+}
+
+/** 위젯 다크/라이트. 바꾸면 이미 놓인 위젯도 바로 다시 그려짐 */
+@Composable
+private fun ThemePicker() {
+    val context = LocalContext.current
+    var light by remember { mutableStateOf(WidgetTheme.isLight(context)) }
+    Row(
+        Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(horizontal = 18.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text("위젯 테마", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+            Text("바꾸면 홈 화면의 위젯이 모두 바로 바뀌어요", color = Sub, fontSize = 13.sp)
+        }
+        Row(Modifier.background(Color(0xFF2C2C2E), RoundedCornerShape(10.dp)).padding(3.dp)) {
+            listOf(false to "다크", true to "라이트").forEach { (value, label) ->
+                val selected = light == value
+                Text(
+                    label,
+                    color = if (selected) Color.White else Sub,
+                    fontSize = 14.sp,
+                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                    modifier = Modifier
+                        .background(if (selected) Color(0xFF636366) else Color.Transparent, RoundedCornerShape(8.dp))
+                        .clickable {
+                            light = value
+                            WidgetTheme.setLight(context, value)
+                        }
+                        .padding(horizontal = 16.dp, vertical = 7.dp),
+                )
+            }
         }
     }
 }

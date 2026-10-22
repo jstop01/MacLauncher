@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 
 /** macOS 미리 알림 위젯: 동그라미 탭 = 완료, 글자 탭 = 수정, + = 추가 */
 class RemindersWidget : AppWidgetProvider() {
@@ -31,7 +32,7 @@ class RemindersWidget : AppWidgetProvider() {
         }
 
         private fun views(context: Context, id: Int): RemoteViews =
-            RemoteViews(context.packageName, R.layout.widget_reminders).apply {
+            RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_reminders)).apply {
                 setTextViewText(R.id.rem_count, ReminderStore.remaining(context).toString())
 
                 val done = ReminderStore.completed(context)
@@ -79,11 +80,12 @@ class RemindersService : RemoteViewsService() {
         override fun getCount() = items.size
 
         override fun getViewAt(position: Int): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.widget_reminders_item)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_reminders_item))
             val item = items.getOrNull(position) ?: return views
             views.setTextViewText(R.id.rem_title, item.title)
             views.setImageViewResource(R.id.rem_check, if (item.done) R.drawable.ic_check_on else R.drawable.ic_check_off)
-            views.setTextColor(R.id.rem_title, if (item.done) 0x80FFFFFF.toInt() else 0xFFFFFFFF.toInt())
+            val p = WidgetTheme.palette(context)
+            views.setTextColor(R.id.rem_title, if (item.done) p.subText else p.text)
             views.setInt(
                 R.id.rem_title, "setPaintFlags",
                 Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG or (if (item.done) Paint.STRIKE_THRU_TEXT_FLAG else 0),
@@ -97,7 +99,7 @@ class RemindersService : RemoteViewsService() {
             Intent().putExtra(ReminderActivity.EXTRA_ACTION, action).putExtra(ReminderActivity.EXTRA_ID, id)
 
         // 기본 "Loading..." 글자 대신 빈 칸
-        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, R.layout.widget_reminders_item)
+        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_reminders_item))
         override fun getViewTypeCount() = 1
         override fun getItemId(position: Int) = items.getOrNull(position)?.id ?: position.toLong()
         override fun hasStableIds() = true

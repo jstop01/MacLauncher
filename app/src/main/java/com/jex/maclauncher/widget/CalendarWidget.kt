@@ -12,6 +12,7 @@ import android.provider.CalendarContract
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -62,7 +63,6 @@ class CalendarWidget : AppWidgetProvider() {
         private const val KEY_OFFSET = "offset_"
 
         private const val WHITE = 0xFFFFFFFF.toInt()
-        private const val DIM = 0x59FFFFFF
         private const val RED = 0xFFFF453A.toInt()
         private const val BLUE = 0xFF0A84FF.toInt()
 
@@ -96,23 +96,24 @@ class CalendarWidget : AppWidgetProvider() {
                 set(Calendar.DAY_OF_MONTH, 1)
                 add(Calendar.MONTH, monthOffset(context, id))
             }
-            val views = RemoteViews(context.packageName, R.layout.widget_calendar)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_calendar))
             views.setTextViewText(R.id.cal_title, "${month.get(Calendar.YEAR)}년 ${month.get(Calendar.MONTH) + 1}월")
 
             // 1일이 있는 주의 일요일부터 42칸. 앞뒤 달 날짜는 흐리게
             val lead = month.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY
             val rows = (lead + month.getActualMaximum(Calendar.DAY_OF_MONTH) + 6) / 7
             val day = (month.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -lead) }
+            val p = WidgetTheme.palette(context)
             DAYS.forEachIndexed { i, cell ->
                 val inMonth = day.get(Calendar.MONTH) == month.get(Calendar.MONTH)
                 val isToday = day.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                     day.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
                 val color = when {
-                    isToday -> WHITE
-                    !inMonth -> DIM
+                    isToday -> WHITE   // 파란 박스 위
+                    !inMonth -> p.dim
                     i % 7 == 0 -> RED
                     i % 7 == 6 -> BLUE
-                    else -> WHITE
+                    else -> p.text
                 }
                 views.setTextViewText(cell, day.get(Calendar.DAY_OF_MONTH).toString())
                 views.setTextColor(cell, color)
@@ -131,7 +132,7 @@ class CalendarWidget : AppWidgetProvider() {
         /** 작은 크기: 오늘 요일 / 날짜 / 월 */
         private fun smallViews(context: Context): RemoteViews {
             val now = Date()
-            return RemoteViews(context.packageName, R.layout.widget_calendar_small).apply {
+            return RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_calendar_small)).apply {
                 setTextViewText(R.id.cal_small_weekday, SimpleDateFormat("EEEE", Locale.KOREAN).format(now))
                 setTextViewText(R.id.cal_small_day, SimpleDateFormat("d", Locale.KOREAN).format(now))
                 setTextViewText(R.id.cal_small_month, SimpleDateFormat("yyyy년 M월", Locale.KOREAN).format(now))

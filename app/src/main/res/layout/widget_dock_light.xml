@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dock_bg_light"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="6dp">
+
+    <!-- 앱 아이콘은 코드에서 addView로 채움 -->
+    <LinearLayout
+        android:id="@+id/dock_icons"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal" />
+
+    <TextView
+        android:id="@+id/dock_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="탭해서 Dock에 넣을 앱 고르기"
+        android:textColor="#CC1C1C1E"
+        android:textSize="13sp"
+        android:visibility="gone" />
+</FrameLayout>

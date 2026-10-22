@@ -10,6 +10,7 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.apps.AppCatalog
 
 /** Finder 격자 한 칸 */
@@ -69,7 +70,7 @@ class FinderItemsService : RemoteViewsService() {
         override fun getCount() = entries.size
 
         override fun getViewAt(position: Int): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.widget_finder_item)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
             when (val e = entries.getOrNull(position)) {
                 is Entry.FileEntry -> {
                     views.setTextViewText(R.id.item_name, e.item.file.name)
@@ -99,7 +100,7 @@ class FinderItemsService : RemoteViewsService() {
                 }
                 is Entry.AddEntry -> {
                     views.setTextViewText(R.id.item_name, if (e.folderId == null) "편집" else "앱 넣기")
-                    views.setImageViewResource(R.id.item_icon, R.drawable.ic_add_tile)
+                    views.setImageViewResource(R.id.item_icon, WidgetTheme.drawable(context, R.drawable.ic_add_tile))
                     views.setOnClickFillInIntent(
                         R.id.item_root,
                         Intent().putExtra(FinderOpenActivity.EXTRA_EDIT_FAVORITES, e.folderId.orEmpty()),
@@ -124,7 +125,7 @@ class FinderItemsService : RemoteViewsService() {
         }
 
         // 기본 "Loading..." 글자 대신 빈 칸
-        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, R.layout.widget_finder_item)
+        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
         override fun getViewTypeCount() = 1
         override fun getItemId(position: Int) = position.toLong()
         override fun hasStableIds() = false

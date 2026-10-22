@@ -3,10 +3,6 @@ package com.jex.maclauncher.widget
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.jex.maclauncher.widget.apps.AppsWidget
-import com.jex.maclauncher.widget.dock.DockWidget
-import com.jex.maclauncher.widget.finder.FinderWidget
-import com.jex.maclauncher.widget.reminders.RemindersWidget
 
 /**
  * 재부팅/앱 업데이트 후 모든 위젯을 다시 그린다.
@@ -14,14 +10,7 @@ import com.jex.maclauncher.widget.reminders.RemindersWidget
  */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        CalendarWidget.updateAll(context)
-        DockWidget.updateAll(context)
-        AppsWidget.refreshAll(context)
-        FinderWidget.refreshAll(context)
-        RemindersWidget.updateAll(context)
-        BatteryWidget.updateAll(context)
-        MonitorWidget.updateAll(context)
-        StorageWidget.refreshAll(context, goAsync())
+        WidgetRefresher.all(context, goAsync())
         if (MonitorWidget.hasWidgets(context)) MonitorService.start(context)
     }
 }

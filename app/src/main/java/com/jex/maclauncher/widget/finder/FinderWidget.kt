@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.WidgetSize
 import com.jex.maclauncher.widget.apps.AppCatalog
 
@@ -71,7 +72,7 @@ class FinderWidget : AppWidgetProvider() {
             val location = location(context, id)
             // 앱 목록은 파일 권한이 필요 없고, 최근 사용 앱은 사용 정보 접근 권한이 필요
             val access = FinderFiles.canShow(context, location)
-            val views = RemoteViews(context.packageName, R.layout.widget_finder)
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder))
 
             views.setTextViewText(R.id.finder_title, FinderFiles.title(context, location))
             views.setViewVisibility(R.id.finder_back, if (FinderFiles.parent(location) != null) View.VISIBLE else View.INVISIBLE)
@@ -84,7 +85,7 @@ class FinderWidget : AppWidgetProvider() {
 
             val selected = FinderFiles.sidebarFor(location)
             FinderFiles.sidebar.forEachIndexed { i, (viewId, _, target) ->
-                views.setInt(viewId, "setBackgroundResource", if (viewId == selected) R.drawable.finder_side_selected else 0)
+                views.setInt(viewId, "setBackgroundResource", if (viewId == selected) WidgetTheme.drawable(context, R.drawable.finder_side_selected) else 0)
                 views.setOnClickPendingIntent(viewId, broadcast(context, id, ACTION_GO, 2 + i) { putExtra(EXTRA_LOCATION, target) })
             }
 

@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.MainActivity
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 /** macOS 배터리 위젯: 폰 + 배터리를 알려주는 연결된 블루투스 기기(최대 3) */
@@ -60,15 +61,15 @@ class BatteryWidget : AppWidgetProvider() {
 
         private fun views(context: Context, batteries: List<Battery>, size: WidgetSize): RemoteViews {
             val small = size.narrowerThan(200)
-            val views = RemoteViews(context.packageName, if (small) R.layout.widget_battery_small else R.layout.widget_battery)
+            val views = RemoteViews(context.packageName, if (small) WidgetTheme.layout(context, R.layout.widget_battery_small) else WidgetTheme.layout(context, R.layout.widget_battery))
             val slots = if (small) 1 else SLOTS.size
             for (i in 0 until slots) {
                 val b = batteries.getOrNull(i)
                 if (!small) views.setViewVisibility(SLOTS[i], if (b != null) View.VISIBLE else View.GONE)
                 if (b == null) continue
                 val color = if (b.level <= 20 && !b.charging) RED else GREEN
-                views.setImageViewBitmap(RINGS[i], MonitorGraphics.ring(b.level / 100f, color))
-                views.setImageViewResource(ICONS[i], b.icon)
+                views.setImageViewBitmap(RINGS[i], MonitorGraphics.ring(b.level / 100f, color, WidgetTheme.palette(context).track))
+                views.setImageViewResource(ICONS[i], WidgetTheme.drawable(context, b.icon))
                 views.setTextViewText(LEVELS[i], (if (b.charging) "⚡" else "") + "${b.level}%")
             }
             // 블루투스 권한이 없으면 안내를 보이고, 탭하면 앱에서 권한 요청 (권한 창은 액티비티에서만 띄울 수 있음)

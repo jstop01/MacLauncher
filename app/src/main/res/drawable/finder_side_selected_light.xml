@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#1A000000" />
+    <corners android:radius="6dp" />
+</shape>

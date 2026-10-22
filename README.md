@@ -15,6 +15,14 @@
 
 모두 홈 화면에서 길게 눌러 크기 조절 / 이동 가능. 작게 줄이면 그 크기에 맞는 모양으로 바뀜 (시스템 모니터: 링+메모리만, 달력: 요일/날짜만, 저장 공간: 막대만, Finder: 사이드바 숨김).
 
+## 테마
+앱 맨 위 '위젯 테마'에서 다크/라이트를 고르면 놓여 있는 위젯이 모두 바로 바뀜.
+라이트 레이아웃·드로어블·스타일(`*_light`)은 다크 쪽에서 자동 생성:
+```
+python3 tools/gen_light_widgets.py
+```
+다크 레이아웃을 고친 뒤에는 이 스크립트를 다시 돌릴 것.
+
 ## 빌드 / 설치
 ```
 echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties
@@ -34,6 +42,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - `widget/reminders/` : 미리 알림 위젯 (`ReminderStore` 저장, `RemindersWidget`/`RemindersService` 목록, `ReminderActivity` 탭·입력 처리)
 - `widget/BatteryWidget` : 배터리 위젯
 - `widget/WidgetSize` : 위젯 크기(dp)로 작은/큰 레이아웃 고르기
+- `widget/WidgetTheme` : 다크/라이트 (레이아웃·드로어블 매핑, 코드에서 그리는 색 팔레트)
+- `widget/WidgetRefresher` : 모든 위젯 다시 그리기 (업데이트/재부팅/테마 변경)
 - `widget/BootReceiver` : 재부팅/업데이트 후 갱신 재시작
 - `system/SystemStats` : CPU(/proc/stat → cpufreq 폴백), RAM
 - `MainActivity` : 위젯 추가 안내 화면

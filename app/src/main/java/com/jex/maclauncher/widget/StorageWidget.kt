@@ -22,6 +22,7 @@ import android.provider.Settings
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.finder.FinderFiles
 import java.util.Locale
 import kotlin.concurrent.thread
@@ -58,7 +59,6 @@ class StorageWidget : AppWidgetProvider() {
     companion object {
         private const val ACTION_REFRESH = "com.jex.maclauncher.storage.REFRESH"
 
-        private const val TRACK = 0xFF3A3A3C.toInt()
         private val COLORS = intArrayOf(
             0xFF8E8E93.toInt(), // 앱 · 시스템
             0xFFFF9F0A.toInt(), // 사진
@@ -114,10 +114,10 @@ class StorageWidget : AppWidgetProvider() {
 
         /** 위젯이 낮으면 범례/안내를 숨기고 막대까지만 */
         private fun views(context: Context, u: Usage, size: WidgetSize): RemoteViews =
-            RemoteViews(context.packageName, R.layout.widget_storage).apply {
+            RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_storage)).apply {
                 setTextViewText(R.id.st_summary, "${gb(u.total, 0)} 중 ${gb(u.used)} 사용")
                 val parts = if (u.detailed) longArrayOf(u.apps, u.photos, u.videos, u.music, u.docs) else longArrayOf(u.used)
-                setImageViewBitmap(R.id.st_bar, bar(parts, u.total))
+                setImageViewBitmap(R.id.st_bar, bar(parts, u.total, WidgetTheme.palette(context)))
 
                 val compact = size.shorterThan(150)
                 setViewVisibility(R.id.st_legend, if (u.detailed && !compact) View.VISIBLE else View.GONE)
@@ -145,14 +145,14 @@ class StorageWidget : AppWidgetProvider() {
             }
 
         /** 항목별 색 구간 + 남은 공간(어두운 트랙). 양 끝만 둥글게 */
-        private fun bar(parts: LongArray, total: Long, width: Int = 600, height: Int = 28): Bitmap {
+        private fun bar(parts: LongArray, total: Long, theme: WidgetTheme.Palette, width: Int = 600, height: Int = 28): Bitmap {
             val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             val c = Canvas(bmp)
             val r = height / 2f
             val clip = Path().apply { addRoundRect(RectF(0f, 0f, width.toFloat(), height.toFloat()), r, r, Path.Direction.CW) }
             c.clipPath(clip)
             val p = Paint(Paint.ANTI_ALIAS_FLAG)
-            p.color = TRACK
+            p.color = theme.track
             c.drawRect(0f, 0f, width.toFloat(), height.toFloat(), p)
             var x = 0f
             parts.forEachIndexed { i, bytes ->
@@ -161,7 +161,7 @@ class StorageWidget : AppWidgetProvider() {
                 c.drawRect(x, 0f, x + w, height.toFloat(), p)
                 x += w
                 // 구간 사이 얇은 틈
-                p.color = 0xFF1E1E20.toInt()
+                p.color = theme.panel
                 if (w > 0) c.drawRect(x - 1.5f, 0f, x, height.toFloat(), p)
             }
             return bmp

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
+<!-- 앱 전용 Finder (응용 프로그램): 제목 막대 / 분류 사이드바 + 앱 격자 / 상태 막대 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg_light"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <!-- 제목 막대: 신호등 · ◀ · 폴더 이름 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="4dp" android:src="@drawable/dot_red" />
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="7dp" android:src="@drawable/dot_yellow" />
+        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="7dp" android:src="@drawable/dot_green" />
+
+        <TextView
+            android:id="@+id/apps_back"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:text="‹"
+            android:textColor="#1C1C1E"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/apps_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#1C1C1E"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- 제목을 가운데 두려고 왼쪽 신호등+◀ 폭만큼 비워둠 -->
+        <TextView
+            android:id="@+id/apps_refresh"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="40dp"
+            android:gravity="center"
+            android:text="⟳"
+            android:textColor="#8E8E93"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/widget_divider_light" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <!-- 사이드바 (위젯이 좁으면 숨김) -->
+        <LinearLayout
+            android:id="@+id/apps_sidebar"
+            android:layout_width="112dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/finder_sidebar_bg_light"
+            android:orientation="vertical"
+            android:padding="6dp">
+
+            <TextView style="@style/FinderSideHeader.Light" android:text="응용 프로그램" />
+            <TextView
+                android:id="@+id/apps_side_all"
+                style="@style/FinderSideItem.Light"
+                android:text="전체" />
+            <TextView
+                android:id="@+id/apps_side_recent"
+                style="@style/FinderSideItem.Light"
+                android:text="최근 설치" />
+            <TextView
+                android:id="@+id/apps_side_games"
+                style="@style/FinderSideItem.Light"
+                android:text="게임" />
+            <TextView
+                android:id="@+id/apps_side_social"
+                style="@style/FinderSideItem.Light"
+                android:text="소셜" />
+            <TextView
+                android:id="@+id/apps_side_media"
+                style="@style/FinderSideItem.Light"
+                android:text="사진 · 동영상" />
+            <TextView
+                android:id="@+id/apps_side_music"
+                style="@style/FinderSideItem.Light"
+                android:text="음악" />
+            <TextView
+                android:id="@+id/apps_side_productivity"
+                style="@style/FinderSideItem.Light"
+                android:text="생산성" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1">
+
+            <GridView
+                android:id="@+id/apps_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:columnWidth="76dp"
+                android:numColumns="auto_fit"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="4dp" />
+
+            <TextView
+                android:id="@+id/apps_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="앱 없음"
+                android:textColor="#AEAEB2"
+                android:textSize="13sp" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/apps_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textColor="#8E8E93"
+        android:textSize="11sp" />
+</LinearLayout>
