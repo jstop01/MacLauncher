@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jex.maclauncher.ui.theme.MacLauncherTheme
+import com.jex.maclauncher.widget.BatteryWidget
 import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
@@ -68,6 +70,7 @@ class MainActivity : ComponentActivity() {
                     onEditDock = ::editDock,
                     onAddStorage = { pin(StorageWidget::class.java) },
                     onAddReminders = { pin(RemindersWidget::class.java) },
+                    onAddBattery = ::pinBattery,
                 )
             }
         }
@@ -78,6 +81,19 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         FinderWidget.refreshAll(this)
         StorageWidget.refreshAll(this)
+    }
+
+    /** 배터리: 블루투스 기기 배터리를 읽으려면 근처 기기 권한 (거부해도 폰 배터리는 표시) */
+    // 권한 창과 위젯 추가 창이 겹치지 않게, 권한 응답 뒤에 추가 창을 띄운다
+    private val bluetoothPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        pin(BatteryWidget::class.java)
+    }
+
+    private fun pinBattery() {
+        val needsAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
+        if (needsAsk) bluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
+        else pin(BatteryWidget::class.java)
     }
 
     /** Dock은 홈에 놓이자마자 앱 고르기 화면을 띄움 (런처가 새 위젯 id를 채워서 불러줌) */
@@ -112,7 +128,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit, onAddReminders: () -> Unit) {
+private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit, onAddReminders: () -> Unit, onAddBattery: () -> Unit) {
     // 실시간 갱신 알림을 보이려면 Android 13+에서 알림 권한 필요 (거부해도 위젯은 동작)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) {
@@ -173,6 +189,12 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
                 title = "미리 알림",
                 detail = "동그라미를 탭하면 완료, 글자를 탭하면 수정, + 로 바로 추가해요. 할 일은 폰 안에만 저장됩니다.",
                 onAdd = onAddReminders,
+            )
+            Spacer(Modifier.height(12.dp))
+            WidgetCard(
+                title = "배터리",
+                detail = "폰과 연결된 블루투스 기기(버즈·워치 등)의 배터리를 링으로 보여줘요. 블루투스 기기는 '근처 기기' 권한이 필요하고, 기기에 따라 배터리를 알려주지 않을 수 있어요.",
+                onAdd = onAddBattery,
             )
             Spacer(Modifier.height(20.dp))
             Text(

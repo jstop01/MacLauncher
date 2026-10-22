@@ -10,6 +10,7 @@
 - **Dock**: 고른 앱(최대 10개)을 Mac Dock처럼 한 줄로, 탭하면 실행. 추가하면 바로 앱 고르기 화면, 나중엔 앱의 'Dock → 앱 고르기' 또는 위젯 설정에서 변경
 - **저장 공간**: 'Macintosh HD'처럼 전체 사용량 + 앱·시스템/사진/동영상/음악/문서·기타 색 막대와 범례. 30분마다, 탭하면 즉시 갱신 (항목별은 '모든 파일 접근' 필요)
 - **미리 알림**: 동그라미 탭 = 완료(취소선, 아래로), 글자 탭 = 수정/삭제, + = 추가, 완료 항목 한 번에 지우기. 폰에만 저장
+- **배터리**: 폰 + 배터리를 알려주는 연결된 블루투스 기기(최대 3) 링. 20% 이하 빨강, 충전 중 ⚡. 30분마다 / 탭 / 블루투스 연결·해제 때 갱신 (시스템 모니터가 돌면 30초마다). 블루투스는 '근처 기기' 권한 필요, 숨은 API라 기기에 따라 안 보일 수 있음
 
 모두 홈 화면에서 길게 눌러 크기 조절 / 이동 가능. 작게 줄이면 그 크기에 맞는 모양으로 바뀜 (시스템 모니터: 링+메모리만, 달력: 요일/날짜만, 저장 공간: 막대만, Finder: 사이드바 숨김).
 
@@ -28,6 +29,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - `widget/dock/` : Dock 위젯 (`DockWidget` 아이콘 줄, `DockConfigActivity` 앱 고르기)
 - `widget/StorageWidget` : 저장 공간 위젯 (StorageStatsManager 전체량 + MediaStore 항목별 합계)
 - `widget/reminders/` : 미리 알림 위젯 (`ReminderStore` 저장, `RemindersWidget`/`RemindersService` 목록, `ReminderActivity` 탭·입력 처리)
+- `widget/BatteryWidget` : 배터리 위젯
+- `widget/WidgetSize` : 위젯 크기(dp)로 작은/큰 레이아웃 고르기
 - `widget/BootReceiver` : 재부팅/업데이트 후 갱신 재시작
 - `system/SystemStats` : CPU(/proc/stat → cpufreq 폴백), RAM
 - `MainActivity` : 위젯 추가 안내 화면

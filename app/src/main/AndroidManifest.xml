@@ -10,6 +10,11 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
+    <!-- 배터리 위젯: 연결된 블루투스 기기 배터리 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
     <!-- 재부팅 후 갱신 재시작 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -161,6 +166,20 @@
             android:taskAffinity=""
             android:theme="@style/Theme.MacLauncher.Trampoline"
             android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <receiver
+            android:name=".widget.BatteryWidget"
+            android:exported="false"
+            android:label="@string/widget_battery_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_battery_info" />
+        </receiver>
 
         <receiver
             android:name=".widget.BootReceiver"

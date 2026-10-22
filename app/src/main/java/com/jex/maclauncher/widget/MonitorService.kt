@@ -58,6 +58,7 @@ class MonitorService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val cpuReader = CpuReader()
+    private var ticks = 0
 
     private val tick = object : Runnable {
         override fun run() {
@@ -67,6 +68,8 @@ class MonitorService : Service() {
             }
             sample()
             MonitorWidget.updateAll(this@MonitorService)
+            // 배터리는 천천히 변하니 30초마다만 (배터리 위젯은 자체 갱신이 30분 간격이라 여기서 보강)
+            if (++ticks % 30 == 0) BatteryWidget.updateAll(this@MonitorService)
             handler.postDelayed(this, 1000)
         }
     }

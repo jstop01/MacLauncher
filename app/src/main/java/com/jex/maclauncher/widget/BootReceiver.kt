@@ -10,6 +10,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         CalendarWidget.updateAll(context)
         DockWidget.updateAll(context)
+        BatteryWidget.updateAll(context)
         if (MonitorWidget.hasWidgets(context)) MonitorService.start(context)
     }
 }
