@@ -6,11 +6,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Finder 위젯: 폰 전체 폴더 보기 (Android 11+는 '모든 파일 접근', 10은 읽기 권한) -->
+    <!-- Finder 위젯: 폰 전체 폴더 보기 (Android 11+는 '모든 파일 접근', 10은 읽기 권한).
+         사진 위젯은 Android 12까지 읽기 권한, 13+는 READ_MEDIA_IMAGES -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
+        android:maxSdkVersion="32" />
     <!-- 배터리 위젯: 연결된 블루투스 기기 배터리 -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission
@@ -20,6 +21,8 @@
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+    <!-- 사진 위젯 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- 달력 위젯: 일정 표시 -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- 재부팅 후 갱신 재시작 -->
@@ -284,6 +287,18 @@
             android:taskAffinity=""
             android:theme="@style/Theme.MacLauncher.Trampoline"
             android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <receiver
+            android:name=".widget.PhotoWidget"
+            android:exported="false"
+            android:label="@string/widget_photo_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_photo_info" />
+        </receiver>
 
         <receiver
             android:name=".widget.BootReceiver"

@@ -21,6 +21,7 @@ object WidgetRefresher {
         BatteryWidget.updateAll(context)
         WeatherWidget.updateAll(context)
         MonitorWidget.updateAll(context)
+        PhotoWidget.refreshAll(context, keepPhoto = true)
         StorageWidget.refreshAll(context, pending)
     }
 }

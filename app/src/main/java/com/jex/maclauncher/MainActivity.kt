@@ -64,6 +64,7 @@ import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.ClockWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
+import com.jex.maclauncher.widget.PhotoWidget
 import com.jex.maclauncher.widget.StorageWidget
 import com.jex.maclauncher.widget.WeatherWidget
 import com.jex.maclauncher.widget.WidgetRefresher
@@ -169,6 +170,10 @@ class MainActivity : ComponentActivity() {
             "미리 알림",
             "동그라미를 탭하면 완료, 글자를 탭하면 수정, + 로 바로 추가해요. 할 일은 폰 안에만 저장됩니다.",
         ) { pin(RemindersWidget::class.java) },
+        WidgetCardSpec(
+            "사진",
+            "갤러리 사진을 한 장씩 꽉 차게 보여주고 1시간마다 바꿔요. 아래에 찍은 날짜가 나오고, 탭하면 갤러리에서 열려요. 사진 접근 권한이 필요해요.",
+        ) { pinAfterPermission(PhotoWidget::class.java, PhotoWidget.permission) },
         WidgetCardSpec(
             "메모",
             "Mac 스티커처럼 색깔 메모지에 메모를 써요. 탭하면 수정하고 색(노랑·파랑·초록·분홍·보라·회색)도 바꿀 수 있어요. 여러 개 놓으면 각각 따로 저장돼요.",

@@ -24,4 +24,6 @@
     <string name="widget_sticky_description">macOS 스티커처럼 색깔 메모지에 쓰는 메모</string>
     <string name="widget_weather_title">날씨</string>
     <string name="widget_weather_description">현재 위치의 날씨와 4일 예보를 보여주는 macOS 스타일 위젯</string>
+    <string name="widget_photo_title">사진</string>
+    <string name="widget_photo_description">갤러리 사진을 한 장씩 바꿔 보여주는 macOS 스타일 사진 위젯</string>
 </resources>
