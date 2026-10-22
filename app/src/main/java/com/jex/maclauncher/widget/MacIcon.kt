@@ -20,7 +20,24 @@ import kotlin.math.sin
 object MacIcon {
 
     fun of(context: Context, packageName: String, size: Int): Bitmap? =
-        runCatching { draw(context.packageManager.getApplicationIcon(packageName), size) }.getOrNull()
+        rawIcon(context, packageName)?.let { runCatching { draw(it, size) }.getOrNull() }
+
+    /**
+     * 앱 APK에 들어 있는 원본 아이콘.
+     * 삼성(One UI)의 getApplicationIcon()은 테마 모양으로 이미 잘리고 흰 판까지 깔린 비트맵을 줘서
+     * 모양을 바꿀 수 없으므로, 런처 액티비티(없으면 앱)의 아이콘 리소스를 직접 읽는다.
+     */
+    fun rawIcon(context: Context, packageName: String): Drawable? {
+        val pm = context.packageManager
+        return runCatching {
+            val app = pm.getApplicationInfo(packageName, 0)
+            val activityIcon = pm.getLaunchIntentForPackage(packageName)?.component
+                ?.let { runCatching { pm.getActivityInfo(it, 0).iconResource }.getOrNull() }
+                ?.takeIf { it != 0 }
+            val res = activityIcon ?: app.icon
+            pm.getResourcesForApplication(app).getDrawableForDensity(res, context.resources.displayMetrics.densityDpi, null)
+        }.getOrNull() ?: runCatching { pm.getApplicationIcon(packageName) }.getOrNull()
+    }
 
     fun draw(icon: Drawable, size: Int): Bitmap {
         val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)

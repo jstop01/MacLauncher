@@ -127,7 +127,8 @@ private fun loadApps(context: Context): List<LaunchableApp> {
             LaunchableApp(
                 packageName = it.activityInfo.packageName,
                 label = it.loadLabel(pm).toString(),
-                icon = MacIcon.draw(it.loadIcon(pm), 96).asImageBitmap(),
+                icon = (MacIcon.rawIcon(context, it.activityInfo.packageName) ?: it.loadIcon(pm))
+                    .let { d -> MacIcon.draw(d, 96) }.asImageBitmap(),
             )
         }
         .sortedBy { it.label.lowercase() }
