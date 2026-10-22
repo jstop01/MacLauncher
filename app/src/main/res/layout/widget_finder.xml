@@ -65,8 +65,9 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <!-- 사이드바 -->
+        <!-- 사이드바 (위젯이 좁으면 숨김) -->
         <LinearLayout
+            android:id="@+id/finder_sidebar"
             android:layout_width="112dp"
             android:layout_height="match_parent"
             android:background="@drawable/finder_sidebar_bg"

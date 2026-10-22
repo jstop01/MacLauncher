@@ -7,9 +7,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.WidgetSize
 
 /**
  * macOS Finder 위젯. 사이드바로 위치를 고르고, 격자에서 폴더를 누르면 들어가고 파일을 누르면 연다.
@@ -19,6 +21,10 @@ class FinderWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         ids.forEach { refresh(context, it) }
+    }
+
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, newOptions: Bundle) {
+        refresh(context, id)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -69,6 +75,10 @@ class FinderWidget : AppWidgetProvider() {
             views.setViewVisibility(R.id.finder_back, if (FinderFiles.parent(location) != null) View.VISIBLE else View.INVISIBLE)
             views.setOnClickPendingIntent(R.id.finder_back, broadcast(context, id, ACTION_BACK, 0))
             views.setOnClickPendingIntent(R.id.finder_refresh, broadcast(context, id, ACTION_REFRESH, 1))
+
+            // 좁으면 사이드바를 숨기고 파일 격자만
+            val narrow = WidgetSize.of(manager, id).narrowerThan(280)
+            views.setViewVisibility(R.id.finder_sidebar, if (narrow) View.GONE else View.VISIBLE)
 
             val selected = FinderFiles.sidebarFor(location)
             FinderFiles.sidebar.forEachIndexed { i, (viewId, _, target) ->

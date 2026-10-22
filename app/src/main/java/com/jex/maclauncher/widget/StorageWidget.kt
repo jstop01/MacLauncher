@@ -15,6 +15,7 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.provider.Settings
@@ -29,6 +30,10 @@ import kotlin.concurrent.thread
 class StorageWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        refreshAll(context, goAsync())
+    }
+
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, newOptions: Bundle) {
         refreshAll(context, goAsync())
     }
 
@@ -69,7 +74,10 @@ class StorageWidget : AppWidgetProvider() {
                 try {
                     val manager = AppWidgetManager.getInstance(app)
                     val ids = manager.getAppWidgetIds(ComponentName(app, StorageWidget::class.java))
-                    if (ids.isNotEmpty()) manager.updateAppWidget(ids, views(app, measure(app)))
+                    if (ids.isNotEmpty()) {
+                        val usage = measure(app)
+                        ids.forEach { id -> manager.updateAppWidget(id, views(app, usage, WidgetSize.of(manager, id))) }
+                    }
                 } finally {
                     pending?.finish()
                 }
@@ -104,14 +112,16 @@ class StorageWidget : AppWidgetProvider() {
             return Usage(total, used, photos, videos, music, docs, detailed = true)
         }
 
-        private fun views(context: Context, u: Usage): RemoteViews =
+        /** 위젯이 낮으면 범례/안내를 숨기고 막대까지만 */
+        private fun views(context: Context, u: Usage, size: WidgetSize): RemoteViews =
             RemoteViews(context.packageName, R.layout.widget_storage).apply {
                 setTextViewText(R.id.st_summary, "${gb(u.total, 0)} 중 ${gb(u.used)} 사용")
                 val parts = if (u.detailed) longArrayOf(u.apps, u.photos, u.videos, u.music, u.docs) else longArrayOf(u.used)
                 setImageViewBitmap(R.id.st_bar, bar(parts, u.total))
 
-                setViewVisibility(R.id.st_legend, if (u.detailed) View.VISIBLE else View.GONE)
-                setViewVisibility(R.id.st_hint, if (u.detailed) View.GONE else View.VISIBLE)
+                val compact = size.shorterThan(150)
+                setViewVisibility(R.id.st_legend, if (u.detailed && !compact) View.VISIBLE else View.GONE)
+                setViewVisibility(R.id.st_hint, if (!u.detailed && !compact) View.VISIBLE else View.GONE)
                 setTextViewText(R.id.st_apps, gb(u.apps))
                 setTextViewText(R.id.st_photos, gb(u.photos))
                 setTextViewText(R.id.st_videos, gb(u.videos))

@@ -7,11 +7,15 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /** macOS 스타일 월간 달력 위젯. ◀ ▶로 달을 넘기고, 제목을 누르면 이번 달로 돌아온다. */
 class CalendarWidget : AppWidgetProvider() {
@@ -40,6 +44,10 @@ class CalendarWidget : AppWidgetProvider() {
                 scheduleMidnight(context)
             }
         }
+    }
+
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, newOptions: Bundle) {
+        update(context, manager, id)
     }
 
     override fun onDeleted(context: Context, ids: IntArray) {
@@ -78,6 +86,11 @@ class CalendarWidget : AppWidgetProvider() {
         private fun monthOffset(context: Context, id: Int) = prefs(context).getInt(KEY_OFFSET + id, 0)
 
         private fun update(context: Context, manager: AppWidgetManager, id: Int) {
+            val size = WidgetSize.of(manager, id)
+            if (size.narrowerThan(200) || size.shorterThan(190)) {
+                manager.updateAppWidget(id, smallViews(context))
+                return
+            }
             val today = Calendar.getInstance()
             val month = (today.clone() as Calendar).apply {
                 set(Calendar.DAY_OF_MONTH, 1)
@@ -113,6 +126,17 @@ class CalendarWidget : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.cal_title, action(context, id, ACTION_TODAY, 2))
             views.setOnClickPendingIntent(R.id.cal_grid, openCalendarApp(context))
             manager.updateAppWidget(id, views)
+        }
+
+        /** 작은 크기: 오늘 요일 / 날짜 / 월 */
+        private fun smallViews(context: Context): RemoteViews {
+            val now = Date()
+            return RemoteViews(context.packageName, R.layout.widget_calendar_small).apply {
+                setTextViewText(R.id.cal_small_weekday, SimpleDateFormat("EEEE", Locale.KOREAN).format(now))
+                setTextViewText(R.id.cal_small_day, SimpleDateFormat("d", Locale.KOREAN).format(now))
+                setTextViewText(R.id.cal_small_month, SimpleDateFormat("yyyy년 M월", Locale.KOREAN).format(now))
+                setOnClickPendingIntent(R.id.cal_small_root, openCalendarApp(context))
+            }
         }
 
         private fun action(context: Context, id: Int, action: String, slot: Int): PendingIntent =

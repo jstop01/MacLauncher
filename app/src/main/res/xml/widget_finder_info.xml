@@ -5,7 +5,7 @@
     android:previewLayout="@layout/widget_finder"
     android:minWidth="250dp"
     android:minHeight="180dp"
-    android:minResizeWidth="250dp"
+    android:minResizeWidth="180dp"
     android:minResizeHeight="150dp"
     android:targetCellWidth="4"
     android:targetCellHeight="3"
