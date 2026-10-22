@@ -12,12 +12,17 @@ import android.graphics.drawable.Drawable
 /** 위젯은 직접 그릴 수 없어서 링/그래프를 비트맵으로 만들어 ImageView에 넣는다. */
 object MonitorGraphics {
 
-    /** 링 게이지 (0..1). track = 빈 부분 색 (테마), center = 가운데에 그릴 아이콘 (링 지름의 40%) */
-    fun ring(progress: Float, color: Int, track: Int, size: Int = 180, center: Drawable? = null): Bitmap {
+    /**
+     * 링 게이지 (0..1). track = 빈 부분 색 (테마), center = 가운데에 그릴 아이콘 (링 지름의 40%),
+     * margin = 비트맵 가장자리 여백 비율 (ImageView가 공간을 채울 때 링이 너무 커지지 않게)
+     */
+    fun ring(progress: Float, color: Int, track: Int, size: Int = 180, center: Drawable? = null, margin: Float = 0f): Bitmap {
         val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
-        val stroke = size * 0.1f
-        val r = RectF(stroke / 2, stroke / 2, size - stroke / 2, size - stroke / 2)
+        val inset = size * margin
+        val ring = size - 2 * inset
+        val stroke = ring * 0.1f
+        val r = RectF(inset + stroke / 2, inset + stroke / 2, size - inset - stroke / 2, size - inset - stroke / 2)
         val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
             strokeWidth = stroke
@@ -28,7 +33,7 @@ object MonitorGraphics {
         p.color = color
         c.drawArc(r, -90f, 360f * progress.coerceIn(0f, 1f), false, p)
         center?.let {
-            val icon = (size * 0.4f).toInt()
+            val icon = (ring * 0.4f).toInt()
             val left = (size - icon) / 2
             it.setBounds(left, left, left + icon, left + icon)
             it.draw(c)

@@ -71,7 +71,7 @@ class BatteryWidget : AppWidgetProvider() {
                 val icon = context.getDrawable(WidgetTheme.drawable(context, b.icon))
                 views.setImageViewBitmap(
                     RINGS[i],
-                    MonitorGraphics.ring(b.level / 100f, color, WidgetTheme.palette(context).track, size = 320, center = icon),
+                    MonitorGraphics.ring(b.level / 100f, color, WidgetTheme.palette(context).track, size = 320, center = icon, margin = 0.15f),
                 )
                 views.setTextViewText(LEVELS[i], (if (b.charging) "⚡" else "") + "${b.level}%")
             }
