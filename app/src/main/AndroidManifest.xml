@@ -229,6 +229,20 @@
             android:theme="@style/Theme.MacLauncher.Trampoline" />
 
         <receiver
+            android:name=".widget.ClockWidget"
+            android:exported="false"
+            android:label="@string/widget_clock_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_clock_info" />
+        </receiver>
+
+        <receiver
             android:name=".widget.BootReceiver"
             android:exported="false">
             <intent-filter>

@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.jex.maclauncher.ui.theme.MacLauncherTheme
 import com.jex.maclauncher.widget.BatteryWidget
 import com.jex.maclauncher.widget.CalendarWidget
+import com.jex.maclauncher.widget.ClockWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
 import com.jex.maclauncher.widget.StorageWidget
@@ -95,17 +96,7 @@ class MainActivity : ComponentActivity() {
         handleBluetoothRequest(intent)
         setContent {
             MacLauncherTheme {
-                WidgetGuide(
-                    onAddMonitor = { pin(MonitorWidget::class.java) },
-                    onAddCalendar = { pin(CalendarWidget::class.java) },
-                    onAddFinder = { pin(FinderWidget::class.java) },
-                    onAddApps = { pin(AppsWidget::class.java) },
-                    onAddDock = ::pinDock,
-                    onEditDock = ::editDock,
-                    onAddStorage = { pin(StorageWidget::class.java) },
-                    onAddReminders = { pin(RemindersWidget::class.java) },
-                    onAddBattery = ::pinBattery,
-                )
+                WidgetGuide(cards())
             }
         }
     }
@@ -118,17 +109,63 @@ class MainActivity : ComponentActivity() {
         AppsWidget.refreshAll(this) // 새로 설치/삭제한 앱 반영
     }
 
-    /** 배터리: 블루투스 기기 배터리를 읽으려면 근처 기기 권한 (거부해도 폰 배터리는 표시) */
-    // 권한 창과 위젯 추가 창이 겹치지 않게, 권한 응답 뒤에 추가 창을 띄운다
-    private val bluetoothPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        pin(BatteryWidget::class.java)
+    /** 앱 화면의 위젯 카드 목록 (위에서부터 이 순서로 보임, Finder는 항상 맨 위) */
+    private fun cards() = listOf(
+        WidgetCardSpec(
+            "Finder",
+            "폴더를 탭하면 위젯 안에서 들어가고, 파일을 탭하면 바로 열려요. 🟡 최소화, 🟢 최대화. 처음 한 번 '모든 파일 접근' 권한을 켜야 합니다 (위젯을 탭하면 설정으로 이동).",
+        ) { pin(FinderWidget::class.java) },
+        WidgetCardSpec(
+            "응용 프로그램",
+            "앱 전용 Finder예요. 전체 · 최근 설치 · 게임 · 소셜 · 사진·동영상 · 음악 · 생산성으로 나눠 보고 탭해서 실행해요.",
+        ) { pin(AppsWidget::class.java) },
+        WidgetCardSpec(
+            "시스템 모니터",
+            "CPU · 메모리 사용량을 1초마다 갱신하고, 탭하면 삼성 디바이스 케어(최적화)로 가요. 갱신하는 동안 알림창에 '시스템 모니터' 알림이 떠 있고, 화면이 꺼지면 멈춥니다.",
+        ) { pin(MonitorWidget::class.java) },
+        WidgetCardSpec(
+            "시계",
+            "Mac 아날로그 시계예요. 작게 놓으면 시계 하나, 넓게 놓으면 서울·뉴욕·런던·도쿄 세계 시계가 돼요. 탭하면 알람 앱이 열려요.",
+        ) { pin(ClockWidget::class.java) },
+        WidgetCardSpec(
+            "달력",
+            "◀ ▶로 달을 넘기고, 년·월을 누르면 이번 달로 돌아와요. 날짜를 누르면 캘린더 앱이 열립니다.",
+        ) { pin(CalendarWidget::class.java) },
+        WidgetCardSpec(
+            "Dock",
+            "자주 쓰는 앱을 골라 Mac Dock처럼 한 줄로 놓고 탭해서 실행해요. 추가하면 바로 앱 고르기 화면이 뜨고, 나중에 '앱 고르기'로 바꿀 수 있어요.",
+            secondary = "앱 고르기" to ::editDock,
+            onAdd = ::pinDock,
+        ),
+        WidgetCardSpec(
+            "저장 공간",
+            "Mac의 'Macintosh HD'처럼 앱 · 사진 · 동영상 · 음악 · 문서별 사용량을 색 막대로 보여줘요. 탭하면 삼성 저장공간 화면, ⟳ 로 새로고침 (항목별 용량은 '모든 파일 접근' 권한 필요).",
+        ) { pin(StorageWidget::class.java) },
+        WidgetCardSpec(
+            "미리 알림",
+            "동그라미를 탭하면 완료, 글자를 탭하면 수정, + 로 바로 추가해요. 할 일은 폰 안에만 저장됩니다.",
+        ) { pin(RemindersWidget::class.java) },
+        WidgetCardSpec(
+            "배터리",
+            "폰과 연결된 블루투스 기기(버즈·워치 등)의 배터리를 링으로 보여줘요. 블루투스 기기는 '근처 기기' 권한이 필요하고, 기기에 따라 배터리를 알려주지 않을 수 있어요.",
+        ) {
+            // 블루투스 기기 배터리를 읽으려면 근처 기기 권한 (거부해도 폰 배터리는 표시)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) pinAfterPermission(BatteryWidget::class.java, Manifest.permission.BLUETOOTH_CONNECT)
+            else pin(BatteryWidget::class.java)
+        },
+    )
+
+    // 권한 창과 위젯 추가 창이 겹치지 않게, 권한 응답 뒤에 추가 창을 띄운다 (거부해도 위젯은 추가)
+    private var pinAfterGrant: Class<*>? = null
+    private val permissionThenPin = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        pinAfterGrant?.let(::pin)
+        pinAfterGrant = null
     }
 
-    private fun pinBattery() {
-        val needsAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED
-        if (needsAsk) bluetoothPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
-        else pin(BatteryWidget::class.java)
+    private fun pinAfterPermission(provider: Class<*>, permission: String) {
+        if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) return pin(provider)
+        pinAfterGrant = provider
+        permissionThenPin.launch(permission)
     }
 
     /** Dock은 홈에 놓이자마자 앱 고르기 화면을 띄움 (런처가 새 위젯 id를 채워서 불러줌) */
@@ -162,8 +199,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private data class WidgetCardSpec(
+    val title: String,
+    val detail: String,
+    val secondary: Pair<String, () -> Unit>? = null,
+    val onAdd: () -> Unit,
+)
+
 @Composable
-private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onAddFinder: () -> Unit, onAddApps: () -> Unit, onAddDock: () -> Unit, onEditDock: () -> Unit, onAddStorage: () -> Unit, onAddReminders: () -> Unit, onAddBattery: () -> Unit) {
+private fun WidgetGuide(cards: List<WidgetCardSpec>) {
     // 실시간 갱신 알림을 보이려면 Android 13+에서 알림 권한 필요 (거부해도 위젯은 동작)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) {
@@ -190,55 +234,10 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
             )
             Spacer(Modifier.height(20.dp))
             ThemePicker()
-            Spacer(Modifier.height(24.dp))
-            WidgetCard(
-                title = "시스템 모니터",
-                detail = "CPU · 메모리 사용량을 1초마다 갱신하고, 탭하면 삼성 디바이스 케어(최적화)로 가요. 갱신하는 동안 알림창에 '시스템 모니터' 알림이 떠 있고, 화면이 꺼지면 멈춥니다.",
-                onAdd = onAddMonitor,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "달력",
-                detail = "◀ ▶로 달을 넘기고, 년·월을 누르면 이번 달로 돌아와요. 날짜를 누르면 캘린더 앱이 열립니다.",
-                onAdd = onAddCalendar,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "Finder",
-                detail = "폴더를 탭하면 위젯 안에서 들어가고, 파일을 탭하면 바로 열려요. 처음 한 번 '모든 파일 접근' 권한을 켜야 합니다 (위젯을 탭하면 설정으로 이동).",
-                onAdd = onAddFinder,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "응용 프로그램",
-                detail = "앱 전용 Finder예요. 전체 · 최근 설치 · 게임 · 소셜 · 사진·동영상 · 음악 · 생산성으로 나눠 보고 탭해서 실행해요.",
-                onAdd = onAddApps,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "Dock",
-                detail = "자주 쓰는 앱을 골라 Mac Dock처럼 한 줄로 놓고 탭해서 실행해요. 추가하면 바로 앱 고르기 화면이 뜨고, 나중에 '앱 고르기'로 바꿀 수 있어요.",
-                onAdd = onAddDock,
-                secondary = "앱 고르기" to onEditDock,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "저장 공간",
-                detail = "Mac의 'Macintosh HD'처럼 앱 · 사진 · 동영상 · 음악 · 문서별 사용량을 색 막대로 보여줘요. 탭하면 삼성 저장공간 화면, ⟳ 로 새로고침 (항목별 용량은 '모든 파일 접근' 권한 필요).",
-                onAdd = onAddStorage,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "미리 알림",
-                detail = "동그라미를 탭하면 완료, 글자를 탭하면 수정, + 로 바로 추가해요. 할 일은 폰 안에만 저장됩니다.",
-                onAdd = onAddReminders,
-            )
-            Spacer(Modifier.height(12.dp))
-            WidgetCard(
-                title = "배터리",
-                detail = "폰과 연결된 블루투스 기기(버즈·워치 등)의 배터리를 링으로 보여줘요. 블루투스 기기는 '근처 기기' 권한이 필요하고, 기기에 따라 배터리를 알려주지 않을 수 있어요.",
-                onAdd = onAddBattery,
-            )
+            cards.forEach { card ->
+                Spacer(Modifier.height(12.dp))
+                WidgetCard(card.title, card.detail, card.onAdd, card.secondary)
+            }
             Spacer(Modifier.height(20.dp))
             Text(
                 "추가 버튼이 안 되면: 홈 화면 빈 곳을 길게 누르기 → 위젯 → Mac 위젯",

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 시계 작은 크기: 아날로그 시계 하나 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/clk_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:padding="8dp">
+
+    <AnalogClock
+        android:id="@+id/clk_face0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dial="@drawable/clock_dial_fallback"
+        android:hand_hour="@drawable/clock_hour"
+        android:hand_minute="@drawable/clock_minute" />
+</FrameLayout>

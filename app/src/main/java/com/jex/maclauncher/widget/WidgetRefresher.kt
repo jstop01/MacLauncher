@@ -11,6 +11,7 @@ import com.jex.maclauncher.widget.reminders.RemindersWidget
 object WidgetRefresher {
     fun all(context: Context, pending: BroadcastReceiver.PendingResult? = null) {
         CalendarWidget.updateAll(context)
+        ClockWidget.updateAll(context)
         DockWidget.updateAll(context)
         AppsWidget.refreshAll(context)
         FinderWidget.refreshAll(context)

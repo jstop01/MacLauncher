@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
+<!-- 시계 작은 크기: 아날로그 시계 하나 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/clk_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg_light"
+    android:padding="8dp">
+
+    <AnalogClock
+        android:id="@+id/clk_face0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dial="@drawable/clock_dial_fallback"
+        android:hand_hour="@drawable/clock_hour"
+        android:hand_minute="@drawable/clock_minute" />
+</FrameLayout>
