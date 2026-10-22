@@ -11,26 +11,19 @@
         <LinearLayout
             android:id="@+id/bat_slot0"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="72dp"
-                android:layout_height="72dp">
-
-                <ImageView
-                    android:id="@+id/bat_ring0"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <ImageView
-                    android:id="@+id/bat_icon0"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_gravity="center" />
-            </FrameLayout>
+            <!-- 링 + 가운데 기기 아이콘을 한 장으로 그려 남는 공간을 꽉 채움 -->
+            <ImageView
+                android:id="@+id/bat_ring0"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="2dp"
+                android:scaleType="fitCenter" />
 
             <TextView
                 android:id="@+id/bat_level0"

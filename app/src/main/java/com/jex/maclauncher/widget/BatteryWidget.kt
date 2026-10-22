@@ -48,7 +48,6 @@ class BatteryWidget : AppWidgetProvider() {
 
         private val SLOTS = intArrayOf(R.id.bat_slot0, R.id.bat_slot1, R.id.bat_slot2, R.id.bat_slot3)
         private val RINGS = intArrayOf(R.id.bat_ring0, R.id.bat_ring1, R.id.bat_ring2, R.id.bat_ring3)
-        private val ICONS = intArrayOf(R.id.bat_icon0, R.id.bat_icon1, R.id.bat_icon2, R.id.bat_icon3)
         private val LEVELS = intArrayOf(R.id.bat_level0, R.id.bat_level1, R.id.bat_level2, R.id.bat_level3)
 
         fun updateAll(context: Context) {
@@ -68,8 +67,12 @@ class BatteryWidget : AppWidgetProvider() {
                 if (!small) views.setViewVisibility(SLOTS[i], if (b != null) View.VISIBLE else View.GONE)
                 if (b == null) continue
                 val color = if (b.level <= 20 && !b.charging) RED else GREEN
-                views.setImageViewBitmap(RINGS[i], MonitorGraphics.ring(b.level / 100f, color, WidgetTheme.palette(context).track))
-                views.setImageViewResource(ICONS[i], WidgetTheme.drawable(context, b.icon))
+                // 링이 위젯 크기만큼 커져도 선명하도록 큰 비트맵으로
+                val icon = context.getDrawable(WidgetTheme.drawable(context, b.icon))
+                views.setImageViewBitmap(
+                    RINGS[i],
+                    MonitorGraphics.ring(b.level / 100f, color, WidgetTheme.palette(context).track, size = 320, center = icon),
+                )
                 views.setTextViewText(LEVELS[i], (if (b.charging) "⚡" else "") + "${b.level}%")
             }
             // 블루투스 권한이 없으면 안내를 보이고, 탭하면 앱에서 권한 요청 (권한 창은 액티비티에서만 띄울 수 있음)
