@@ -26,4 +26,7 @@
     <string name="widget_weather_description">현재 위치의 날씨와 4일 예보를 보여주는 macOS 스타일 위젯</string>
     <string name="widget_photo_title">사진</string>
     <string name="widget_photo_description">갤러리 사진을 한 장씩 바꿔 보여주는 macOS 스타일 사진 위젯</string>
+    <string name="widget_music_title">지금 재생 중</string>
+    <string name="widget_music_description">재생 중인 음악의 앨범 아트·제목과 재생 버튼</string>
+    <string name="music_listener_label">Mac 위젯 음악 정보</string>
 </resources>

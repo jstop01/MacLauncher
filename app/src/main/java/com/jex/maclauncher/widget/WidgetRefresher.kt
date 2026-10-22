@@ -5,6 +5,7 @@ import android.content.Context
 import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
+import com.jex.maclauncher.widget.music.MusicWidget
 import com.jex.maclauncher.widget.reminders.RemindersWidget
 import com.jex.maclauncher.widget.sticky.StickyWidget
 
@@ -13,6 +14,7 @@ object WidgetRefresher {
     fun all(context: Context, pending: BroadcastReceiver.PendingResult? = null) {
         CalendarWidget.updateAll(context)
         ClockWidget.updateAll(context)
+        MusicWidget.updateAll(context)
         StickyWidget.updateAll(context)
         DockWidget.updateAll(context)
         AppsWidget.refreshAll(context)

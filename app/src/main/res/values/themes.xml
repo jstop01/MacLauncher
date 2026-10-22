@@ -26,6 +26,15 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <!-- 지금 재생 중 버튼 -->
+    <style name="MusicButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
     <!-- Finder 위젯 사이드바 -->
     <style name="FinderSideHeader">
         <item name="android:layout_width">match_parent</item>

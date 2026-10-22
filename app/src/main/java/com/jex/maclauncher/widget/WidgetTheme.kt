@@ -53,6 +53,8 @@ object WidgetTheme {
             R.drawable.widget_bg to R.drawable.widget_bg_light,
             R.drawable.finder_side_selected to R.drawable.finder_side_selected_light,
             R.drawable.ic_add_tile to R.drawable.ic_add_tile_light,
+            R.drawable.ic_media_play to R.drawable.ic_media_play_light,
+            R.drawable.ic_media_pause to R.drawable.ic_media_pause_light,
             R.drawable.ic_bat_phone to R.drawable.ic_bat_phone_light,
             R.drawable.ic_bat_headphones to R.drawable.ic_bat_headphones_light,
             R.drawable.ic_bat_watch to R.drawable.ic_bat_watch_light,

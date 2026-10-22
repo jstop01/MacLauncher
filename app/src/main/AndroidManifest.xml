@@ -301,6 +301,29 @@
         </receiver>
 
         <receiver
+            android:name=".widget.music.MusicWidget"
+            android:exported="false"
+            android:label="@string/widget_music_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_music_info" />
+        </receiver>
+
+        <!-- '알림 접근'으로 다른 앱의 재생 정보를 읽음 (알림 내용은 안 씀) -->
+        <service
+            android:name=".widget.music.MusicListenerService"
+            android:exported="true"
+            android:label="@string/music_listener_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <receiver
             android:name=".widget.BootReceiver"
             android:exported="false">
             <intent-filter>

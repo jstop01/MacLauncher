@@ -73,6 +73,7 @@ import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
+import com.jex.maclauncher.widget.music.MusicWidget
 import com.jex.maclauncher.widget.reminders.RemindersWidget
 import com.jex.maclauncher.widget.sticky.StickyWidget
 
@@ -174,6 +175,10 @@ class MainActivity : ComponentActivity() {
             "사진",
             "갤러리 사진을 한 장씩 꽉 차게 보여주고 1시간마다 바꿔요. 아래에 찍은 날짜가 나오고, 탭하면 갤러리에서 열려요. 사진 접근 권한이 필요해요.",
         ) { pinAfterPermission(PhotoWidget::class.java, PhotoWidget.permission) },
+        WidgetCardSpec(
+            "지금 재생 중",
+            "재생 중인 음악의 앨범 아트·제목·가수와 ⏮ ⏯ ⏭ 버튼이에요. 유튜브 뮤직·멜론·스포티파이 등 어떤 앱이든 돼요. 처음 한 번 위젯을 탭해서 '알림 접근'을 켜주세요 (알림 내용은 읽지 않아요).",
+        ) { pin(MusicWidget::class.java) },
         WidgetCardSpec(
             "메모",
             "Mac 스티커처럼 색깔 메모지에 메모를 써요. 탭하면 수정하고 색(노랑·파랑·초록·분홍·보라·회색)도 바꿀 수 있어요. 여러 개 놓으면 각각 따로 저장돼요.",
