@@ -65,6 +65,7 @@ import com.jex.maclauncher.widget.ClockWidget
 import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
 import com.jex.maclauncher.widget.StorageWidget
+import com.jex.maclauncher.widget.WeatherWidget
 import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
@@ -81,19 +82,31 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private const val EXTRA_REQUEST_BLUETOOTH = "request_bluetooth"
+        private const val EXTRA_REQUEST_LOCATION = "request_location"
 
         /** 배터리 위젯 탭 → 근처 기기(블루투스) 권한 요청 */
         fun requestBluetoothIntent(context: Context): Intent =
             Intent(context, MainActivity::class.java).putExtra(EXTRA_REQUEST_BLUETOOTH, true)
+
+        /** 날씨 위젯 탭 → 위치 권한 요청 */
+        fun requestLocationIntent(context: Context): Intent =
+            Intent(context, MainActivity::class.java).putExtra(EXTRA_REQUEST_LOCATION, true)
     }
 
     private val bluetoothOnly = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         BatteryWidget.updateAll(this)
     }
 
+    private val locationOnly = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        WeatherWidget.updateAll(this)
+    }
+
     private fun handleBluetoothRequest(intent: Intent) {
         if (intent.getBooleanExtra(EXTRA_REQUEST_BLUETOOTH, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             bluetoothOnly.launch(Manifest.permission.BLUETOOTH_CONNECT)
+        }
+        if (intent.getBooleanExtra(EXTRA_REQUEST_LOCATION, false)) {
+            locationOnly.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
     }
 
@@ -181,6 +194,10 @@ class MainActivity : ComponentActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) pinAfterPermission(BatteryWidget::class.java, Manifest.permission.BLUETOOTH_CONNECT)
             else pin(BatteryWidget::class.java)
         },
+        WidgetCardSpec(
+            "날씨",
+            "현재 위치의 날씨와 4일 예보를 Mac 날씨처럼 보여줘요. 위치 권한이 필요하고(거부하면 탭해서 다시 허용), 30분마다 갱신돼요. 탭하면 바로 새로고침해요.",
+        ) { pinAfterPermission(WeatherWidget::class.java, Manifest.permission.ACCESS_COARSE_LOCATION) },
     )
 
     /** Finder 🟡 최소화 아이콘 위치 고르기 창 */

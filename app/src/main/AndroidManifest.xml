@@ -22,6 +22,9 @@
         tools:ignore="ProtectedPermissions" />
     <!-- 재부팅 후 갱신 재시작 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- 날씨 위젯: Open-Meteo 호출 + 현재 위치 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- Dock 위젯: 실행 가능한 앱 목록 보기 (Android 11+ 패키지 가시성) -->
     <queries>
@@ -240,6 +243,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_clock_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.WeatherWidget"
+            android:exported="false"
+            android:label="@string/widget_weather_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_weather_info" />
         </receiver>
 
         <receiver

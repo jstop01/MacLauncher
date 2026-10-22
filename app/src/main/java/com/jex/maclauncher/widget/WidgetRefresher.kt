@@ -19,6 +19,7 @@ object WidgetRefresher {
         FinderWidget.refreshAll(context)
         RemindersWidget.updateAll(context)
         BatteryWidget.updateAll(context)
+        WeatherWidget.updateAll(context)
         MonitorWidget.updateAll(context)
         StorageWidget.refreshAll(context, pending)
     }

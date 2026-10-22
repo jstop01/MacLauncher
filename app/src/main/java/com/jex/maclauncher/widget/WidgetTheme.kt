@@ -45,6 +45,8 @@ object WidgetTheme {
             R.layout.widget_reminders_item to R.layout.widget_reminders_item_light,
             R.layout.widget_reminders to R.layout.widget_reminders_light,
             R.layout.widget_storage to R.layout.widget_storage_light,
+            R.layout.widget_weather to R.layout.widget_weather_light,
+            R.layout.widget_weather_small to R.layout.widget_weather_small_light,
     )
 
     private val LIGHT_DRAWABLES = mapOf(
