@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
+
+    <!-- 칸(폭 균등 분할)과 높이 중 작은 쪽에 맞춰 줄어듦: 앱이 많거나 위젯이 좁아도 안 겹침 -->
+    <ImageView
+        android:id="@+id/dock_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:padding="3dp"
+        android:scaleType="fitCenter" />
+</FrameLayout>

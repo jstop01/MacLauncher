@@ -13,6 +13,14 @@
     <!-- 재부팅 후 갱신 재시작 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Dock 위젯: 실행 가능한 앱 목록 보기 (Android 11+ 패키지 가시성) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
@@ -92,6 +100,29 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <receiver
+            android:name=".widget.dock.DockWidget"
+            android:exported="false"
+            android:label="@string/widget_dock_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_dock_info" />
+        </receiver>
+
+        <!-- 런처가 위젯 추가/설정 때 여는 화면이라 exported -->
+        <activity
+            android:name=".widget.dock.DockConfigActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
 
         <receiver
             android:name=".widget.BootReceiver"
