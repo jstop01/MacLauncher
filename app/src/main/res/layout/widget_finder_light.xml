@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_bg_light"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -172,11 +171,12 @@
         android:textColor="#8E8E93"
         android:textSize="11sp" />
 
-    <!-- 최소화 상태: 이 아이콘만 남음, 탭하면 다시 펼침 -->
+    <!-- 최소화 상태: 신호등 버튼 자리(왼쪽 위)에 이 아이콘만 남음, 탭하면 다시 펼침 -->
     <ImageView
         android:id="@+id/finder_mini"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="start|top"
         android:contentDescription="Finder 펼치기"
         android:src="@drawable/ic_finder_face"
         android:visibility="gone" />
