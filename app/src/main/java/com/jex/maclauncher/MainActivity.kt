@@ -55,6 +55,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jex.maclauncher.ui.theme.MacLauncherTheme
+import com.jex.maclauncher.backup.WidgetBackup
+import java.util.Locale
+import java.util.Date
+import java.text.SimpleDateFormat
 import com.jex.maclauncher.widget.BatteryWidget
 import com.jex.maclauncher.widget.CalendarWidget
 import com.jex.maclauncher.widget.ClockWidget
@@ -261,6 +265,8 @@ private fun WidgetGuide(cards: List<WidgetCardSpec>) {
             )
             Spacer(Modifier.height(20.dp))
             ThemePicker()
+            Spacer(Modifier.height(12.dp))
+            BackupPanel()
             cards.forEach { card ->
                 Spacer(Modifier.height(12.dp))
                 WidgetCard(card.title, card.detail, card.onAdd, card.secondary)
@@ -275,6 +281,44 @@ private fun WidgetGuide(cards: List<WidgetCardSpec>) {
 }
 
 /** 위젯 다크/라이트. 바꾸면 이미 놓인 위젯도 바로 다시 그려짐 */
+/** 백업: Finder 즐겨찾기·Dock·메모·미리 알림·테마를 파일 하나로 내보내고 불러오기 */
+@Composable
+private fun BackupPanel() {
+    val context = LocalContext.current
+    val today = remember { SimpleDateFormat("yyyyMMdd", Locale.US).format(Date()) }
+    val exporter = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val ok = runCatching { WidgetBackup.export(context, uri) }.isSuccess
+        Toast.makeText(context, if (ok) "백업 파일을 저장했어요" else "저장하지 못했어요", Toast.LENGTH_SHORT).show()
+    }
+    val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val msg = runCatching { WidgetBackup.import(context, uri) }.fold(
+            onSuccess = { r ->
+                buildString {
+                    append("복원했어요")
+                    if (r.pendingDock + r.pendingSticky > 0) {
+                        append(" · 남은 Dock ${r.pendingDock}개, 메모 ${r.pendingSticky}개는 새로 추가할 때 채워져요")
+                    }
+                }
+            },
+            onFailure = { it.message ?: "불러오지 못했어요" },
+        )
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+    }
+    Row(
+        Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(horizontal = 18.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text("백업", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+            Text("즐겨찾기 · Dock · 메모 · 미리 알림 · 테마", color = Sub, fontSize = 13.sp)
+        }
+        TextButton(onClick = { importer.launch(arrayOf("application/json", "application/octet-stream", "*/*")) }) { Text("불러오기") }
+        Button(onClick = { exporter.launch("mac-widgets-backup-$today.json") }) { Text("내보내기") }
+    }
+}
+
 /** 최소화 아이콘 위치 9칸 (위젯 모양의 3x3 격자) */
 @Composable
 private fun MiniPositionPicker(current: Int, onPick: (Int) -> Unit, onDismiss: () -> Unit) {

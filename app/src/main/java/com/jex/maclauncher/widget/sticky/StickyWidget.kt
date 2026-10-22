@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.backup.WidgetBackup
 
 /** macOS 스티커 색 (메모지 색, 글씨는 항상 검정) */
 enum class StickyColor(val label: String, val argb: Long) {
@@ -40,8 +41,12 @@ class StickyWidget : AppWidgetProvider() {
         fun color(context: Context, id: Int): StickyColor =
             runCatching { StickyColor.valueOf(prefs(context).getString(KEY_COLOR + id, null)!!) }.getOrDefault(StickyColor.YELLOW)
 
-        fun save(context: Context, id: Int, text: String, color: StickyColor) {
+        fun saveQuietly(context: Context, id: Int, text: String, color: StickyColor) {
             prefs(context).edit().putString(KEY_TEXT + id, text).putString(KEY_COLOR + id, color.name).apply()
+        }
+
+        fun save(context: Context, id: Int, text: String, color: StickyColor) {
+            saveQuietly(context, id, text, color)
             update(context, AppWidgetManager.getInstance(context), id)
         }
 
@@ -51,6 +56,10 @@ class StickyWidget : AppWidgetProvider() {
         }
 
         private fun update(context: Context, manager: AppWidgetManager, id: Int) {
+            // 백업에서 복원했는데 그때 메모가 모자랐다면, 새로 놓인 메모에 채움
+            if (!prefs(context).contains(KEY_TEXT + id)) {
+                WidgetBackup.takePendingSticky(context)?.let { (text, color) -> saveQuietly(context, id, text, color) }
+            }
             val views = RemoteViews(context.packageName, R.layout.widget_sticky)
             val text = text(context, id)
             views.setTextViewText(R.id.sticky_text, text.ifBlank { "탭해서 메모 쓰기" })

@@ -60,6 +60,11 @@ object WidgetTheme {
     fun isLight(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_LIGHT, false)
 
+    /** 저장만 (다시 그리기는 호출한 쪽에서, 백업 복원용) */
+    fun setLightQuietly(context: Context, light: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_LIGHT, light).apply()
+    }
+
     fun setLight(context: Context, light: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_LIGHT, light).apply()
         WidgetRefresher.all(context)

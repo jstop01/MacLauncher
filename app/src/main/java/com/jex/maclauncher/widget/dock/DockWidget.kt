@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
+import com.jex.maclauncher.backup.WidgetBackup
 import com.jex.maclauncher.widget.WidgetTheme
 
 /** macOS Dock 위젯: 고른 앱 아이콘을 한 줄로, 탭하면 실행. 앱 목록은 위젯마다 따로 저장. */
@@ -43,6 +44,11 @@ class DockWidget : AppWidgetProvider() {
         fun apps(context: Context, id: Int): List<String> {
             val saved = prefs(context).getString(KEY_APPS + id, null)
             if (saved != null) return saved.split(",").filter { it.isNotBlank() }
+            // 백업에서 복원했는데 그때 Dock이 모자랐다면, 새로 놓인 Dock에 채움
+            WidgetBackup.takePendingDock(context)?.let { restored ->
+                saveQuietly(context, id, restored)
+                return restored
+            }
             val pm = context.packageManager
             return DEFAULTS.filter { pm.getLaunchIntentForPackage(it) != null }
                 .distinctBy { DEFAULT_GROUP[it] ?: it }
@@ -58,8 +64,12 @@ class DockWidget : AppWidgetProvider() {
             "com.sec.android.gallery3d" to "gallery", "com.google.android.apps.photos" to "gallery",
         )
 
-        fun save(context: Context, id: Int, packages: List<String>) {
+        fun saveQuietly(context: Context, id: Int, packages: List<String>) {
             prefs(context).edit().putString(KEY_APPS + id, packages.joinToString(",")).apply()
+        }
+
+        fun save(context: Context, id: Int, packages: List<String>) {
+            saveQuietly(context, id, packages)
             update(context, AppWidgetManager.getInstance(context), id)
         }
 

@@ -71,6 +71,10 @@ class FinderWidget : AppWidgetProvider() {
          */
         fun miniPosition(context: Context) = prefs(context).getInt(KEY_MINI_POSITION, 0).coerceIn(0, 8)
 
+        fun setMiniPositionQuietly(context: Context, position: Int) {
+            prefs(context).edit().putInt(KEY_MINI_POSITION, position.coerceIn(0, 8)).apply()
+        }
+
         fun setMiniPosition(context: Context, position: Int) {
             prefs(context).edit().putInt(KEY_MINI_POSITION, position).apply()
             refreshAll(context)
