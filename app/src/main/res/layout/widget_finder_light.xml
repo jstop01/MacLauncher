@@ -2,28 +2,32 @@
 <!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
 <!-- macOS Finder 창 모양 위젯: 제목 막대 / 사이드바 + 파일 격자 / 상태 막대 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/finder_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_bg_light"
+    android:gravity="center"
     android:orientation="vertical"
     android:padding="10dp">
 
-    <!-- 제목 막대: 신호등 · ◀ · 폴더 이름 -->
+    <!-- 제목 막대: 신호등(닫기·최소화·최대화) · ◀ · 폴더 이름. 최소화하면 이 막대만 남음 -->
     <LinearLayout
+        android:id="@+id/finder_titlebar"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="4dp" android:src="@drawable/dot_red" />
-        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="7dp" android:src="@drawable/dot_yellow" />
-        <ImageView android:layout_width="11dp" android:layout_height="11dp" android:layout_marginStart="7dp" android:src="@drawable/dot_green" />
+        <!-- 점은 11dp, 누르는 영역은 패딩으로 넓힘 -->
+        <ImageView android:id="@+id/finder_close" android:layout_width="25dp" android:layout_height="32dp" android:paddingHorizontal="7dp" android:paddingVertical="10.5dp" android:src="@drawable/dot_red" />
+        <ImageView android:id="@+id/finder_minimize" android:layout_width="25dp" android:layout_height="32dp" android:paddingHorizontal="7dp" android:paddingVertical="10.5dp" android:src="@drawable/dot_yellow" />
+        <ImageView android:id="@+id/finder_zoom" android:layout_width="25dp" android:layout_height="32dp" android:paddingHorizontal="7dp" android:paddingVertical="10.5dp" android:src="@drawable/dot_green" />
 
         <TextView
             android:id="@+id/finder_back"
             android:layout_width="36dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="2dp"
             android:gravity="center"
             android:text="‹"
             android:textColor="#1C1C1E"
@@ -54,6 +58,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/finder_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="6dp"
@@ -61,6 +66,7 @@
         android:src="@drawable/widget_divider_light" />
 
     <LinearLayout
+        android:id="@+id/finder_body"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -165,4 +171,13 @@
         android:gravity="center"
         android:textColor="#8E8E93"
         android:textSize="11sp" />
+
+    <!-- 최소화 상태: 이 아이콘만 남음, 탭하면 다시 펼침 -->
+    <ImageView
+        android:id="@+id/finder_mini"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:contentDescription="Finder 펼치기"
+        android:src="@drawable/ic_finder_face"
+        android:visibility="gone" />
 </LinearLayout>

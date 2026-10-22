@@ -48,6 +48,7 @@ object WidgetTheme {
     )
 
     private val LIGHT_DRAWABLES = mapOf(
+            R.drawable.widget_bg to R.drawable.widget_bg_light,
             R.drawable.finder_side_selected to R.drawable.finder_side_selected_light,
             R.drawable.ic_add_tile to R.drawable.ic_add_tile_light,
             R.drawable.ic_bat_phone to R.drawable.ic_bat_phone_light,

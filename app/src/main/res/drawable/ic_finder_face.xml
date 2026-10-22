@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 최소화된 Finder 위젯 아이콘: 파랑/흰색 반반의 웃는 얼굴 (직접 그림) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <clip-path android:pathData="M32,2 C52,2 62,12 62,32 C62,52 52,62 32,62 C12,62 2,52 2,32 C2,12 12,2 32,2 Z" />
+    <!-- 오른쪽 밝은 면 -->
+    <path android:fillColor="#EEF2F7" android:pathData="M0,0 L64,0 L64,64 L0,64 Z" />
+    <!-- 왼쪽 파란 면: 이마 → 코 → 입술 → 턱으로 내려오는 옆얼굴 선 -->
+    <path android:fillColor="#2F8CF0"
+        android:pathData="M0,0 L36,0 C34,10 32,18 31,26 C30,31 27,34 26,37 C29,38 31,39 31,41 C31,46 33,54 35,64 L0,64 Z" />
+    <!-- 왼쪽 눈 -->
+    <path android:fillColor="#1C1C1E" android:pathData="M18,18 m-2,0 a2,2 0 0,1 4,0 l0,7 a2,2 0 0,1 -4,0 Z" />
+    <!-- 오른쪽 눈 -->
+    <path android:fillColor="#1C1C1E" android:pathData="M44,18 m-2,0 a2,2 0 0,1 4,0 l0,7 a2,2 0 0,1 -4,0 Z" />
+    <!-- 미소 -->
+    <path android:fillColor="#00000000" android:strokeColor="#1C1C1E" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:pathData="M14,44 C22,51 42,51 50,44" />
+</vector>

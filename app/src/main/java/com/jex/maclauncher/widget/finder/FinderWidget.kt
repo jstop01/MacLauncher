@@ -37,21 +37,40 @@ class FinderWidget : AppWidgetProvider() {
             ACTION_GO -> intent.getStringExtra(EXTRA_LOCATION)?.let { go(context, id, it) }
             ACTION_BACK -> FinderFiles.parent(location(context, id))?.let { go(context, id, it) }
             ACTION_REFRESH -> refresh(context, id)
+            ACTION_MINIMIZE -> toggle(context, KEY_MINIMIZED + id).also { refresh(context, id) }
+            ACTION_ZOOM -> toggle(context, KEY_ZOOMED + id).also { refresh(context, id) }
+            // 닫기: 즐겨찾는 앱 첫 화면으로, 펼친 상태로
+            ACTION_CLOSE -> {
+                prefs(context).edit().remove(KEY_MINIMIZED + id).remove(KEY_ZOOMED + id).apply()
+                go(context, id, FinderFiles.FAVORITES)
+            }
         }
     }
 
     override fun onDeleted(context: Context, ids: IntArray) {
-        prefs(context).edit().apply { ids.forEach { remove(KEY_LOCATION + it) } }.apply()
+        prefs(context).edit().apply {
+            ids.forEach { remove(KEY_LOCATION + it); remove(KEY_MINIMIZED + it); remove(KEY_ZOOMED + it) }
+        }.apply()
     }
 
     companion object {
         private const val ACTION_GO = "com.jex.maclauncher.finder.GO"
         private const val ACTION_BACK = "com.jex.maclauncher.finder.BACK"
         private const val ACTION_REFRESH = "com.jex.maclauncher.finder.REFRESH"
+        private const val ACTION_CLOSE = "com.jex.maclauncher.finder.CLOSE"
+        private const val ACTION_MINIMIZE = "com.jex.maclauncher.finder.MINIMIZE"
+        private const val ACTION_ZOOM = "com.jex.maclauncher.finder.ZOOM"
+        private const val KEY_MINIMIZED = "minimized_"
+        private const val KEY_ZOOMED = "zoomed_"
         private const val EXTRA_LOCATION = "location"
         private const val KEY_LOCATION = "location_"
 
         private fun prefs(context: Context) = context.getSharedPreferences("finder_widget", Context.MODE_PRIVATE)
+
+        private fun toggle(context: Context, key: String) {
+            val p = prefs(context)
+            p.edit().putBoolean(key, !p.getBoolean(key, false)).apply()
+        }
 
         fun location(context: Context, id: Int): String =
             prefs(context).getString(KEY_LOCATION + id, null) ?: FinderFiles.RECENT
@@ -78,9 +97,24 @@ class FinderWidget : AppWidgetProvider() {
             views.setViewVisibility(R.id.finder_back, if (FinderFiles.parent(location) != null) View.VISIBLE else View.INVISIBLE)
             views.setOnClickPendingIntent(R.id.finder_back, broadcast(context, id, ACTION_BACK, 0))
             views.setOnClickPendingIntent(R.id.finder_refresh, broadcast(context, id, ACTION_REFRESH, 1))
+            views.setOnClickPendingIntent(R.id.finder_close, broadcast(context, id, ACTION_CLOSE, 13))
+            views.setOnClickPendingIntent(R.id.finder_minimize, broadcast(context, id, ACTION_MINIMIZE, 14))
+            views.setOnClickPendingIntent(R.id.finder_mini, broadcast(context, id, ACTION_MINIMIZE, 14))
+            views.setOnClickPendingIntent(R.id.finder_zoom, broadcast(context, id, ACTION_ZOOM, 15))
+
+            // 최소화: 창은 감추고 Finder 아이콘만 (배경도 투명하게)
+            val minimized = prefs(context).getBoolean(KEY_MINIMIZED + id, false)
+            val windowParts = intArrayOf(R.id.finder_titlebar, R.id.finder_divider, R.id.finder_body, R.id.finder_footer)
+            windowParts.forEach { views.setViewVisibility(it, if (minimized) View.GONE else View.VISIBLE) }
+            views.setViewVisibility(R.id.finder_mini, if (minimized) View.VISIBLE else View.GONE)
+            views.setInt(
+                R.id.finder_root, "setBackgroundResource",
+                if (minimized) 0 else WidgetTheme.drawable(context, R.drawable.widget_bg),
+            )
 
             // 좁으면 사이드바를 숨기고 파일 격자만
-            val narrow = WidgetSize.of(manager, id).narrowerThan(280)
+            // 최대화(🟢)도 사이드바를 숨겨 격자를 창 전체로
+            val narrow = WidgetSize.of(manager, id).narrowerThan(280) || prefs(context).getBoolean(KEY_ZOOMED + id, false)
             views.setViewVisibility(R.id.finder_sidebar, if (narrow) View.GONE else View.VISIBLE)
 
             val selected = FinderFiles.sidebarFor(location)
