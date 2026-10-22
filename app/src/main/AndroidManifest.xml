@@ -20,6 +20,8 @@
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+    <!-- 달력 위젯: 일정 표시 -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- 재부팅 후 갱신 재시작 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- 날씨 위젯: Open-Meteo 호출 + 현재 위치 -->
@@ -84,6 +86,11 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <!-- 캘린더 일정이 바뀌면 다시 그림 -->
+            <intent-filter>
+                <action android:name="android.intent.action.PROVIDER_CHANGED" />
+                <data android:scheme="content" android:host="com.android.calendar" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

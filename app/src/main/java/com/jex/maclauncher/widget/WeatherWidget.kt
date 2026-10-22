@@ -199,7 +199,7 @@ class WeatherWidget : AppWidgetProvider() {
         private fun click(context: Context, granted: Boolean): PendingIntent =
             if (!granted) {
                 PendingIntent.getActivity(
-                    context, 2, MainActivity.requestLocationIntent(context),
+                    context, 2, MainActivity.requestPermissionIntent(context, Manifest.permission.ACCESS_COARSE_LOCATION),
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
                 )
             } else {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
-<!-- 달력 작은 크기: macOS 작은 캘린더 위젯처럼 요일 / 날짜 / 월 -->
+<!-- 달력 작은 크기: macOS 작은 캘린더 위젯처럼 요일 / 날짜 / 다음 일정 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cal_small_root"
     android:layout_width="match_parent"
@@ -20,17 +20,34 @@
     <TextView
         android:id="@+id/cal_small_day"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
         android:includeFontPadding="false"
         android:textColor="#1C1C1E"
-        android:textSize="48sp" />
+        android:textSize="40sp" />
 
-    <TextView
-        android:id="@+id/cal_small_month"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#8E8E93"
-        android:textSize="13sp" />
+    <!-- 다음 일정 최대 2개 (일정이 없거나 권한이 없으면 안내 한 줄) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/cal_small_ev0"
+            style="@style/CalEvent.Light" />
+
+        <TextView
+            android:id="@+id/cal_small_ev1"
+            style="@style/CalEvent.Light"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/cal_small_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="#8E8E93"
+            android:textSize="12sp" />
+    </LinearLayout>
 </LinearLayout>

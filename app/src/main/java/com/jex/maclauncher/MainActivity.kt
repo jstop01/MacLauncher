@@ -66,6 +66,7 @@ import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
 import com.jex.maclauncher.widget.StorageWidget
 import com.jex.maclauncher.widget.WeatherWidget
+import com.jex.maclauncher.widget.WidgetRefresher
 import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
@@ -81,45 +82,31 @@ private val Sub = Color(0x99FFFFFF)
 class MainActivity : ComponentActivity() {
 
     companion object {
-        private const val EXTRA_REQUEST_BLUETOOTH = "request_bluetooth"
-        private const val EXTRA_REQUEST_LOCATION = "request_location"
+        private const val EXTRA_REQUEST_PERMISSION = "request_permission"
 
-        /** 배터리 위젯 탭 → 근처 기기(블루투스) 권한 요청 */
-        fun requestBluetoothIntent(context: Context): Intent =
-            Intent(context, MainActivity::class.java).putExtra(EXTRA_REQUEST_BLUETOOTH, true)
-
-        /** 날씨 위젯 탭 → 위치 권한 요청 */
-        fun requestLocationIntent(context: Context): Intent =
-            Intent(context, MainActivity::class.java).putExtra(EXTRA_REQUEST_LOCATION, true)
+        /** 위젯 탭 → 이 화면을 열어 권한 하나 요청 (권한 창은 액티비티에서만 띄울 수 있음), 끝나면 위젯 다시 그림 */
+        fun requestPermissionIntent(context: Context, permission: String): Intent =
+            Intent(context, MainActivity::class.java).putExtra(EXTRA_REQUEST_PERMISSION, permission)
     }
 
-    private val bluetoothOnly = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        BatteryWidget.updateAll(this)
+    private val permissionOnly = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        WidgetRefresher.all(this)
     }
 
-    private val locationOnly = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        WeatherWidget.updateAll(this)
-    }
-
-    private fun handleBluetoothRequest(intent: Intent) {
-        if (intent.getBooleanExtra(EXTRA_REQUEST_BLUETOOTH, false) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            bluetoothOnly.launch(Manifest.permission.BLUETOOTH_CONNECT)
-        }
-        if (intent.getBooleanExtra(EXTRA_REQUEST_LOCATION, false)) {
-            locationOnly.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
-        }
+    private fun handlePermissionRequest(intent: Intent) {
+        intent.getStringExtra(EXTRA_REQUEST_PERMISSION)?.let(permissionOnly::launch)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        handleBluetoothRequest(intent)
+        handlePermissionRequest(intent)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // 앱 화면(포그라운드)에서는 서비스 시작이 항상 허용됨
         if (MonitorWidget.hasWidgets(this)) MonitorService.start(this)
-        handleBluetoothRequest(intent)
+        handlePermissionRequest(intent)
         setContent {
             MacLauncherTheme {
                 WidgetGuide(cards())
@@ -166,8 +153,8 @@ class MainActivity : ComponentActivity() {
         ) { pin(ClockWidget::class.java) },
         WidgetCardSpec(
             "달력",
-            "◀ ▶로 달을 넘기고, 년·월을 누르면 이번 달로 돌아와요. 날짜를 누르면 캘린더 앱이 열립니다.",
-        ) { pin(CalendarWidget::class.java) },
+            "◀ ▶로 달을 넘기고, 일정이 있는 날엔 점이 찍혀요. 작게 놓으면 다음 일정 2개를 보여줘요. 일정을 보려면 캘린더 권한이 필요해요.",
+        ) { pinAfterPermission(CalendarWidget::class.java, Manifest.permission.READ_CALENDAR) },
         WidgetCardSpec(
             "Dock",
             "자주 쓰는 앱을 골라 Mac Dock처럼 한 줄로 놓고 탭해서 실행해요. 추가하면 바로 앱 고르기 화면이 뜨고, 나중에 '앱 고르기'로 바꿀 수 있어요.",

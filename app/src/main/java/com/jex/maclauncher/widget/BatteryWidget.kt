@@ -80,7 +80,7 @@ class BatteryWidget : AppWidgetProvider() {
             if (!small) views.setViewVisibility(R.id.bat_hint, if (needsPermission) View.VISIBLE else View.GONE)
             val click = if (needsPermission) {
                 PendingIntent.getActivity(
-                    context, 1, MainActivity.requestBluetoothIntent(context),
+                    context, 1, MainActivity.requestPermissionIntent(context, Manifest.permission.BLUETOOTH_CONNECT),
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
                 )
             } else {

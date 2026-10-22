@@ -16,6 +16,16 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <!-- 작은 달력의 다음 일정 한 줄 (왼쪽 색 막대는 코드에서 글자 앞 '▍'로) -->
+    <style name="CalEvent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <!-- Finder 위젯 사이드바 -->
     <style name="FinderSideHeader">
         <item name="android:layout_width">match_parent</item>

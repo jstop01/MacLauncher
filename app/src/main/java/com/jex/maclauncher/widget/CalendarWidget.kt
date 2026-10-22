@@ -6,7 +6,12 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
+import android.Manifest
 import android.content.Intent
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import com.jex.maclauncher.MainActivity
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.view.View
@@ -40,7 +45,7 @@ class CalendarWidget : AppWidgetProvider() {
                 prefs(context).edit().putInt(KEY_OFFSET + id, offset).apply()
                 update(context, AppWidgetManager.getInstance(context), id)
             }
-            ACTION_MIDNIGHT, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED -> {
+            ACTION_MIDNIGHT, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_PROVIDER_CHANGED -> {
                 updateAll(context)
                 scheduleMidnight(context)
             }
@@ -63,6 +68,7 @@ class CalendarWidget : AppWidgetProvider() {
         private const val KEY_OFFSET = "offset_"
 
         private const val WHITE = 0xFFFFFFFF.toInt()
+        private const val EVENT = 0xFF8E8E93.toInt()
         private const val RED = 0xFFFF453A.toInt()
         private const val BLUE = 0xFF0A84FF.toInt()
 
@@ -104,6 +110,7 @@ class CalendarWidget : AppWidgetProvider() {
             val rows = (lead + month.getActualMaximum(Calendar.DAY_OF_MONTH) + 6) / 7
             val day = (month.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -lead) }
             val p = WidgetTheme.palette(context)
+            val busy = CalendarEvents.daysWithEvents(context, month)
             DAYS.forEachIndexed { i, cell ->
                 val inMonth = day.get(Calendar.MONTH) == month.get(Calendar.MONTH)
                 val isToday = day.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
@@ -115,7 +122,9 @@ class CalendarWidget : AppWidgetProvider() {
                     i % 7 == 6 -> BLUE
                     else -> p.text
                 }
-                views.setTextViewText(cell, day.get(Calendar.DAY_OF_MONTH).toString())
+                // 일정 있는 날은 숫자 아래 작은 점 (모든 칸이 두 줄이라 숫자 위치가 같음)
+                val hasEvent = inMonth && day.get(Calendar.DAY_OF_MONTH) in busy
+                views.setTextViewText(cell, dayLabel(day.get(Calendar.DAY_OF_MONTH), hasEvent, if (isToday) WHITE else EVENT))
                 views.setTextColor(cell, color)
                 views.setInt(cell, "setBackgroundResource", if (isToday) R.drawable.cal_today else 0)
                 day.add(Calendar.DAY_OF_MONTH, 1)
@@ -129,15 +138,66 @@ class CalendarWidget : AppWidgetProvider() {
             manager.updateAppWidget(id, views)
         }
 
-        /** 작은 크기: 오늘 요일 / 날짜 / 월 */
+        /** "13\n•" : 날짜 아래 작은 점 (없으면 같은 높이의 빈 줄) */
+        private fun dayLabel(day: Int, dot: Boolean, dotColor: Int): CharSequence {
+            val text = SpannableString("$day\n${if (dot) "●" else " "}")
+            val dotStart = text.length - 1
+            text.setSpan(RelativeSizeSpan(0.4f), dotStart, text.length, 0)
+            if (dot) text.setSpan(ForegroundColorSpan(dotColor), dotStart, text.length, 0)
+            return text
+        }
+
+        /** 작은 크기: 오늘 요일 / 날짜 / 다음 일정 2개 */
         private fun smallViews(context: Context): RemoteViews {
             val now = Date()
-            return RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_calendar_small)).apply {
-                setTextViewText(R.id.cal_small_weekday, SimpleDateFormat("EEEE", Locale.KOREAN).format(now))
-                setTextViewText(R.id.cal_small_day, SimpleDateFormat("d", Locale.KOREAN).format(now))
-                setTextViewText(R.id.cal_small_month, SimpleDateFormat("yyyy년 M월", Locale.KOREAN).format(now))
-                setOnClickPendingIntent(R.id.cal_small_root, openCalendarApp(context))
+            val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_calendar_small))
+            views.setTextViewText(R.id.cal_small_weekday, SimpleDateFormat("EEEE", Locale.KOREAN).format(now))
+            views.setTextViewText(R.id.cal_small_day, SimpleDateFormat("d", Locale.KOREAN).format(now))
+
+            val rows = intArrayOf(R.id.cal_small_ev0, R.id.cal_small_ev1)
+            val events = CalendarEvents.upcoming(context, rows.size)
+            rows.forEachIndexed { i, row ->
+                val e = events.getOrNull(i)
+                views.setViewVisibility(row, if (e != null) View.VISIBLE else View.GONE)
+                if (e != null) views.setTextViewText(row, eventLine(context, e))
             }
+            val note = when {
+                !CalendarEvents.hasAccess(context) -> "탭해서 일정 표시"
+                events.isEmpty() -> "예정된 일정 없음"
+                else -> null
+            }
+            views.setViewVisibility(R.id.cal_small_note, if (note != null) View.VISIBLE else View.GONE)
+            views.setTextViewText(R.id.cal_small_note, note.orEmpty())
+
+            // 권한이 없으면 탭 = 권한 요청, 있으면 캘린더 앱
+            val click = if (CalendarEvents.hasAccess(context)) openCalendarApp(context) else PendingIntent.getActivity(
+                context, 3, MainActivity.requestPermissionIntent(context, Manifest.permission.READ_CALENDAR),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+            views.setOnClickPendingIntent(R.id.cal_small_root, click)
+            return views
+        }
+
+        /** "▍오후 2:00  회의" (막대는 캘린더 색, 오늘이 아니면 "내일"/"10/25" 붙임) */
+        private fun eventLine(context: Context, e: CalendarEvents.Event): CharSequence {
+            val todayStart = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+            val dayDiff = Math.floorDiv(e.begin - todayStart, 24 * 60 * 60 * 1000L)
+            val whenText = buildString {
+                if (!e.allDay || dayDiff != 0L) append(
+                    when (dayDiff) {
+                        0L -> ""
+                        1L -> "내일 "
+                        else -> SimpleDateFormat("M/d ", Locale.KOREAN).format(Date(e.begin))
+                    },
+                )
+                append(if (e.allDay) "종일" else SimpleDateFormat("a h:mm", Locale.KOREAN).format(Date(e.begin)))
+            }
+            val text = SpannableString("▍$whenText  ${e.title}")
+            text.setSpan(ForegroundColorSpan(e.color or 0xFF000000.toInt()), 0, 1, 0)
+            text.setSpan(ForegroundColorSpan(WidgetTheme.palette(context).subText), 1, 1 + whenText.length, 0)
+            return text
         }
 
         private fun action(context: Context, id: Int, action: String, slot: Int): PendingIntent =
