@@ -76,6 +76,10 @@
 
             <TextView style="@style/FinderSideHeader" android:text="즐겨찾기" />
             <TextView
+                android:id="@+id/side_favorites"
+                style="@style/FinderSideItem"
+                android:text="즐겨찾는 앱" />
+            <TextView
                 android:id="@+id/side_recent"
                 style="@style/FinderSideItem"
                 android:text="최근 항목" />

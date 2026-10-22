@@ -14,12 +14,19 @@ import java.util.Locale
 
 data class FinderItem(val file: File, val isDir: Boolean)
 
-/** Finder 위젯이 보여주는 위치와 파일 목록. 위치는 절대 경로이거나 RECENT(최근 항목). */
+/**
+ * Finder 위젯이 보여주는 위치와 파일 목록.
+ * 위치는 절대 경로, 또는 특별 위치 RECENT(최근 항목) / APPS(응용 프로그램) / FAVORITES(즐겨찾는 앱, 폴더는 "favorites/<id>").
+ */
 object FinderFiles {
 
     const val RECENT = "recent"
     /** 응용 프로그램: 파일 대신 설치된 앱을 보여주는 위치 */
     const val APPS = "apps"
+    const val FAVORITES = "favorites"
+
+    fun favoriteFolder(id: String) = "$FAVORITES/$id"
+    fun favoriteFolderId(location: String): String? = location.removePrefix("$FAVORITES/").takeIf { it != location }
     private const val RECENT_LIMIT = 60
     private const val MAX_ITEMS = 300
 
@@ -28,6 +35,7 @@ object FinderFiles {
     /** 사이드바 항목: id → (이름, 위치) */
     val sidebar: List<Triple<Int, String, String>>
         get() = listOf(
+            Triple(R.id.side_favorites, "즐겨찾는 앱", FAVORITES),
             Triple(R.id.side_recent, "최근 항목", RECENT),
             Triple(R.id.side_apps, "응용 프로그램", APPS),
             Triple(R.id.side_download, "다운로드", dir(Environment.DIRECTORY_DOWNLOADS)),
@@ -44,8 +52,13 @@ object FinderFiles {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager()
         else context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 
-    fun title(location: String): String =
-        sidebar.firstOrNull { it.third == location }?.second ?: File(location).name
+    fun title(context: Context, location: String): String {
+        favoriteFolderId(location)?.let { id -> return FavoritesStore.folder(context, id)?.name ?: "즐겨찾는 앱" }
+        return sidebar.firstOrNull { it.third == location }?.second ?: File(location).name
+    }
+
+    /** 파일이 아니라 앱/즐겨찾기를 보여주는 위치 (파일 권한 불필요) */
+    fun isAppLocation(location: String) = location == APPS || location == FAVORITES || favoriteFolderId(location) != null
 
     /** 지금 위치가 속한 사이드바 항목 (가장 깊게 일치하는 것) */
     fun sidebarFor(location: String): Int? =
@@ -54,7 +67,8 @@ object FinderFiles {
 
     /** 뒤로: 상위 폴더. 최근 항목이나 저장소 맨 위에선 null */
     fun parent(location: String): String? {
-        if (location == RECENT || location == APPS || location == root.path) return null
+        if (favoriteFolderId(location) != null) return FAVORITES
+        if (location == RECENT || location == APPS || location == FAVORITES || location == root.path) return null
         return File(location).parentFile?.path?.takeIf { it.startsWith(root.path) }
     }
 

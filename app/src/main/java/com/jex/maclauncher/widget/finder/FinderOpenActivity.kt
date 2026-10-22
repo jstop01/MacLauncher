@@ -25,6 +25,8 @@ class FinderOpenActivity : Activity() {
         const val EXTRA_PATH = "path"
         const val EXTRA_IS_DIR = "is_dir"
         const val EXTRA_PACKAGE = "package"
+        /** 즐겨찾기 편집: 빈 문자열 = 전체 편집 화면, 폴더 id = 그 폴더의 앱 고르기 */
+        const val EXTRA_EDIT_FAVORITES = "edit_favorites"
         private const val EXTRA_PERMISSION = "permission"
 
         /** 격자 항목용 템플릿. 항목마다 fill-in으로 경로를 채우므로 MUTABLE */
@@ -49,7 +51,9 @@ class FinderOpenActivity : Activity() {
         val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         val path = intent.getStringExtra(EXTRA_PATH)
         val app = intent.getStringExtra(EXTRA_PACKAGE)
+        val editFavorites = intent.getStringExtra(EXTRA_EDIT_FAVORITES)
         when {
+            editFavorites != null -> startActivity(FavoritesActivity.intent(this, editFavorites.ifEmpty { null }))
             app != null -> packageManager.getLaunchIntentForPackage(app)
                 ?.let { runCatching { startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } }
             intent.getBooleanExtra(EXTRA_PERMISSION, false) -> requestAccess(widgetId)

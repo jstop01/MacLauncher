@@ -96,7 +96,8 @@ class RemindersService : RemoteViewsService() {
         private fun fillIn(action: String, id: Long) =
             Intent().putExtra(ReminderActivity.EXTRA_ACTION, action).putExtra(ReminderActivity.EXTRA_ID, id)
 
-        override fun getLoadingView(): RemoteViews? = null
+        // 기본 "Loading..." 글자 대신 빈 칸
+        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, R.layout.widget_reminders_item)
         override fun getViewTypeCount() = 1
         override fun getItemId(position: Int) = items.getOrNull(position)?.id ?: position.toLong()
         override fun hasStableIds() = true

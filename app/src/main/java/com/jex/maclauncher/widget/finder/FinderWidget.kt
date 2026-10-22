@@ -70,10 +70,10 @@ class FinderWidget : AppWidgetProvider() {
             val manager = AppWidgetManager.getInstance(context)
             val location = location(context, id)
             // 앱 목록은 파일 권한이 필요 없음
-            val access = location == FinderFiles.APPS || FinderFiles.hasAccess(context)
+            val access = FinderFiles.isAppLocation(location) || FinderFiles.hasAccess(context)
             val views = RemoteViews(context.packageName, R.layout.widget_finder)
 
-            views.setTextViewText(R.id.finder_title, FinderFiles.title(location))
+            views.setTextViewText(R.id.finder_title, FinderFiles.title(context, location))
             views.setViewVisibility(R.id.finder_back, if (FinderFiles.parent(location) != null) View.VISIBLE else View.INVISIBLE)
             views.setOnClickPendingIntent(R.id.finder_back, broadcast(context, id, ACTION_BACK, 0))
             views.setOnClickPendingIntent(R.id.finder_refresh, broadcast(context, id, ACTION_REFRESH, 1))
@@ -99,8 +99,11 @@ class FinderWidget : AppWidgetProvider() {
                 views.setViewVisibility(R.id.finder_permission, View.GONE)
                 views.setTextViewText(
                     R.id.finder_footer,
-                    if (location == FinderFiles.APPS) "${AppCatalog.list(context, AppCatalog.Section.ALL).size}개 앱"
-                    else FinderFiles.freeSpace(),
+                    when {
+                        location == FinderFiles.APPS -> "${AppCatalog.list(context, AppCatalog.Section.ALL).size}개 앱"
+                        FinderFiles.isAppLocation(location) -> "즐겨찾기 · ＋ 로 편집"
+                        else -> FinderFiles.freeSpace()
+                    },
                 )
             } else {
                 views.setViewVisibility(R.id.finder_grid, View.GONE)

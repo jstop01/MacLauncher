@@ -11,7 +11,15 @@ import android.widget.RemoteViewsService
 import androidx.core.graphics.drawable.toBitmap
 import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.apps.AppCatalog
-import com.jex.maclauncher.widget.apps.InstalledApp
+
+/** Finder 격자 한 칸 */
+private sealed interface Entry {
+    data class FileEntry(val item: FinderItem) : Entry
+    data class AppEntry(val packageName: String, val label: String) : Entry
+    data class FolderEntry(val folder: FavoriteFolder) : Entry
+    /** 즐겨찾기 편집 (folderId가 있으면 그 폴더의 앱 고르기) */
+    data class AddEntry(val folderId: String?) : Entry
+}
 
 /** Finder 위젯 격자의 항목들을 만들어 주는 서비스 */
 class FinderItemsService : RemoteViewsService() {
@@ -19,8 +27,7 @@ class FinderItemsService : RemoteViewsService() {
         Factory(applicationContext, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID))
 
     private class Factory(private val context: Context, private val widgetId: Int) : RemoteViewsFactory {
-        private var items: List<FinderItem> = emptyList()
-        private var apps: List<InstalledApp> = emptyList()   // '응용 프로그램' 위치일 때
+        private var entries: List<Entry> = emptyList()
         private val thumbs = HashMap<String, Bitmap?>()
 
         override fun onCreate() = Unit
@@ -28,44 +35,74 @@ class FinderItemsService : RemoteViewsService() {
         // 바인더 스레드에서 불리므로 파일 읽기 OK
         override fun onDataSetChanged() {
             val location = FinderWidget.location(context, widgetId)
-            if (location == FinderFiles.APPS) {
-                apps = AppCatalog.list(context, AppCatalog.Section.ALL)
-                items = emptyList()
-            } else {
-                apps = emptyList()
-                items = FinderFiles.list(context, location)
+            val folderId = FinderFiles.favoriteFolderId(location)
+            entries = when {
+                location == FinderFiles.APPS ->
+                    AppCatalog.list(context, AppCatalog.Section.ALL).map { Entry.AppEntry(it.packageName, it.label) }
+                // 즐겨찾기 맨 위: 폴더 → 앱 → ＋
+                location == FinderFiles.FAVORITES -> {
+                    val fav = FavoritesStore.load(context)
+                    fav.folders.map { Entry.FolderEntry(it) } + apps(fav.apps) + Entry.AddEntry(null)
+                }
+                folderId != null ->
+                    apps(FavoritesStore.folder(context, folderId)?.apps.orEmpty()) + Entry.AddEntry(folderId)
+                else -> FinderFiles.list(context, location).map { Entry.FileEntry(it) }
             }
             thumbs.clear()
         }
 
-        override fun onDestroy() = thumbs.clear()
-
-        override fun getCount() = if (apps.isNotEmpty()) apps.size else items.size
-
-        override fun getViewAt(position: Int): RemoteViews {
-            if (apps.isNotEmpty()) return appView(position)
-            val item = items.getOrNull(position) ?: return RemoteViews(context.packageName, R.layout.widget_finder_item)
-            return RemoteViews(context.packageName, R.layout.widget_finder_item).apply {
-                setTextViewText(R.id.item_name, item.file.name)
-                val thumb = thumbnail(item)
-                if (thumb != null) setImageViewBitmap(R.id.item_icon, thumb)
-                else setImageViewResource(R.id.item_icon, FinderFiles.iconFor(item))
-                setOnClickFillInIntent(
-                    R.id.item_root,
-                    Intent().putExtra(FinderOpenActivity.EXTRA_PATH, item.file.path)
-                        .putExtra(FinderOpenActivity.EXTRA_IS_DIR, item.isDir),
-                )
+        /** 지워진 앱은 빼고 라벨 붙이기 */
+        private fun apps(packages: List<String>): List<Entry> {
+            val pm = context.packageManager
+            return packages.mapNotNull { pkg ->
+                runCatching { Entry.AppEntry(pkg, pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()) }.getOrNull()
             }
         }
 
-        /** 앱 아이콘 + 이름, 탭하면 실행 */
-        private fun appView(position: Int): RemoteViews {
+        override fun onDestroy() = thumbs.clear()
+
+        override fun getCount() = entries.size
+
+        override fun getViewAt(position: Int): RemoteViews {
             val views = RemoteViews(context.packageName, R.layout.widget_finder_item)
-            val app = apps.getOrNull(position) ?: return views
-            views.setTextViewText(R.id.item_name, app.label)
-            runCatching { context.packageManager.getApplicationIcon(app.packageName).toBitmap(112, 112) }
-                .onSuccess { views.setImageViewBitmap(R.id.item_icon, it) }
-            views.setOnClickFillInIntent(R.id.item_root, Intent().putExtra(FinderOpenActivity.EXTRA_PACKAGE, app.packageName))
+            when (val e = entries.getOrNull(position)) {
+                is Entry.FileEntry -> {
+                    views.setTextViewText(R.id.item_name, e.item.file.name)
+                    val thumb = thumbnail(e.item)
+                    if (thumb != null) views.setImageViewBitmap(R.id.item_icon, thumb)
+                    else views.setImageViewResource(R.id.item_icon, FinderFiles.iconFor(e.item))
+                    views.setOnClickFillInIntent(
+                        R.id.item_root,
+                        Intent().putExtra(FinderOpenActivity.EXTRA_PATH, e.item.file.path)
+                            .putExtra(FinderOpenActivity.EXTRA_IS_DIR, e.item.isDir),
+                    )
+                }
+                is Entry.AppEntry -> {
+                    views.setTextViewText(R.id.item_name, e.label)
+                    runCatching { context.packageManager.getApplicationIcon(e.packageName).toBitmap(112, 112) }
+                        .onSuccess { views.setImageViewBitmap(R.id.item_icon, it) }
+                    views.setOnClickFillInIntent(R.id.item_root, Intent().putExtra(FinderOpenActivity.EXTRA_PACKAGE, e.packageName))
+                }
+                is Entry.FolderEntry -> {
+                    views.setTextViewText(R.id.item_name, e.folder.name)
+                    views.setImageViewResource(R.id.item_icon, e.folder.color.icon)
+                    // 폴더 위치로 이동 (파일 폴더와 같은 경로)
+                    views.setOnClickFillInIntent(
+                        R.id.item_root,
+                        Intent().putExtra(FinderOpenActivity.EXTRA_PATH, FinderFiles.favoriteFolder(e.folder.id))
+                            .putExtra(FinderOpenActivity.EXTRA_IS_DIR, true),
+                    )
+                }
+                is Entry.AddEntry -> {
+                    views.setTextViewText(R.id.item_name, if (e.folderId == null) "편집" else "앱 넣기")
+                    views.setImageViewResource(R.id.item_icon, R.drawable.ic_add_tile)
+                    views.setOnClickFillInIntent(
+                        R.id.item_root,
+                        Intent().putExtra(FinderOpenActivity.EXTRA_EDIT_FAVORITES, e.folderId.orEmpty()),
+                    )
+                }
+                null -> Unit
+            }
             return views
         }
 
@@ -82,7 +119,8 @@ class FinderItemsService : RemoteViewsService() {
             }
         }
 
-        override fun getLoadingView(): RemoteViews? = null
+        // 기본 "Loading..." 글자 대신 빈 칸
+        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, R.layout.widget_finder_item)
         override fun getViewTypeCount() = 1
         override fun getItemId(position: Int) = position.toLong()
         override fun hasStableIds() = false

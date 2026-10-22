@@ -133,7 +133,8 @@ class AppsItemsService : RemoteViewsService() {
             return views
         }
 
-        override fun getLoadingView(): RemoteViews? = null
+        // 기본 "Loading..." 글자 대신 빈 칸
+        override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, R.layout.widget_finder_item)
         override fun getViewTypeCount() = 1
         override fun getItemId(position: Int) = position.toLong()
         override fun hasStableIds() = false
