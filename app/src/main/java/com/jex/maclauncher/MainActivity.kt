@@ -193,7 +193,7 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
             Spacer(Modifier.height(24.dp))
             WidgetCard(
                 title = "시스템 모니터",
-                detail = "CPU · 메모리 사용량을 1초마다 갱신해요. 갱신하는 동안 알림창에 '시스템 모니터' 알림이 떠 있고, 화면이 꺼지면 멈춥니다.",
+                detail = "CPU · 메모리 사용량을 1초마다 갱신하고, 탭하면 삼성 디바이스 케어(최적화)로 가요. 갱신하는 동안 알림창에 '시스템 모니터' 알림이 떠 있고, 화면이 꺼지면 멈춥니다.",
                 onAdd = onAddMonitor,
             )
             Spacer(Modifier.height(12.dp))
@@ -224,7 +224,7 @@ private fun WidgetGuide(onAddMonitor: () -> Unit, onAddCalendar: () -> Unit, onA
             Spacer(Modifier.height(12.dp))
             WidgetCard(
                 title = "저장 공간",
-                detail = "Mac의 'Macintosh HD'처럼 앱 · 사진 · 동영상 · 음악 · 문서별 사용량을 색 막대로 보여줘요. 탭하면 새로고침 (항목별 용량은 '모든 파일 접근' 권한 필요).",
+                detail = "Mac의 'Macintosh HD'처럼 앱 · 사진 · 동영상 · 음악 · 문서별 사용량을 색 막대로 보여줘요. 탭하면 삼성 저장공간 화면, ⟳ 로 새로고침 (항목별 용량은 '모든 파일 접근' 권한 필요).",
                 onAdd = onAddStorage,
             )
             Spacer(Modifier.height(12.dp))

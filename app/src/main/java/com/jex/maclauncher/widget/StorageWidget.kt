@@ -128,20 +128,31 @@ class StorageWidget : AppWidgetProvider() {
                 setTextViewText(R.id.st_music, gb(u.music))
                 setTextViewText(R.id.st_docs, gb(u.docs))
 
-                // 권한 있으면 탭 = 새로고침, 없으면 권한 설정 화면
-                val click = if (u.detailed || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                // 탭 = 삼성 저장공간 화면, ⟳ = 새로고침, 권한 안내 문구 탭 = 권한 설정
+                setOnClickPendingIntent(
+                    R.id.st_root,
+                    PendingIntent.getActivity(
+                        context, 2, SystemShortcuts.storage(context),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    ),
+                )
+                setOnClickPendingIntent(
+                    R.id.st_refresh,
                     PendingIntent.getBroadcast(
                         context, 0, Intent(context, StorageWidget::class.java).setAction(ACTION_REFRESH),
                         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-                    )
-                } else {
-                    PendingIntent.getActivity(
-                        context, 1,
-                        Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}")),
-                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    ),
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    setOnClickPendingIntent(
+                        R.id.st_hint,
+                        PendingIntent.getActivity(
+                            context, 1,
+                            Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}")),
+                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                        ),
                     )
                 }
-                setOnClickPendingIntent(R.id.st_root, click)
             }
 
         /** 항목별 색 구간 + 남은 공간(어두운 트랙). 양 끝만 둥글게 */

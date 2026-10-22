@@ -64,13 +64,21 @@ class MonitorWidget : AppWidgetProvider() {
                     setImageViewBitmap(R.id.mon_mem_graph, MonitorGraphics.graph(s.memHistory, MonitorService.HISTORY, GREEN, p.grid))
                 }
 
-                // 서비스가 안 돌고 있으면 안내 문구를 보이고, 탭하면 서비스 시작 (사용자 탭은 백그라운드 제한 예외)
+                // 서비스가 돌고 있으면 탭 = 삼성 디바이스 케어(최적화),
+                // 안 돌고 있으면 안내 문구 + 탭 = 서비스 시작 (사용자 탭은 백그라운드 제한 예외)
                 setViewVisibility(R.id.mon_hint, if (MonitorService.running) View.GONE else View.VISIBLE)
-                val start = PendingIntent.getForegroundService(
-                    context, 0, Intent(context, MonitorService::class.java),
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-                )
-                setOnClickPendingIntent(R.id.mon_root, start)
+                val click = if (MonitorService.running) {
+                    PendingIntent.getActivity(
+                        context, 1, SystemShortcuts.deviceCare(context),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    )
+                } else {
+                    PendingIntent.getForegroundService(
+                        context, 0, Intent(context, MonitorService::class.java),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    )
+                }
+                setOnClickPendingIntent(R.id.mon_root, click)
             }
         }
 
