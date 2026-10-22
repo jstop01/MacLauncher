@@ -25,13 +25,22 @@ object MacIcon {
     fun draw(icon: Drawable, size: Int): Bitmap {
         val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
-        if (icon is AdaptiveIconDrawable) {
+        val background = (icon as? AdaptiveIconDrawable)?.background
+        if (icon is AdaptiveIconDrawable && background != null && !isPlainLight(background)) {
+            // 색 배경이 디자인의 일부(카메라, 설정 등): macOS처럼 배경을 스쿼클에 꽉 채움
             c.clipPath(squircle(size.toFloat()))
             // 적응형 아이콘 레이어는 보이는 영역보다 사방 25%씩 크게 그려진다 (108dp 중 72dp가 보임)
             val inset = size / 4
-            for (layer in listOfNotNull(icon.background, icon.foreground)) {
+            for (layer in listOfNotNull(background, icon.foreground)) {
                 layer.setBounds(-inset, -inset, size + inset, size + inset)
                 layer.draw(c)
+            }
+        } else if (icon is AdaptiveIconDrawable) {
+            // 흰 단색 판 위에 로고만 있는 아이콘(Chrome, Gmail 등): 판은 빼고 그림만, 조금 크게
+            val inset = (size * 0.3f).toInt()
+            icon.foreground?.apply {
+                setBounds(-inset, -inset, size + inset, size + inset)
+                draw(c)
             }
         } else {
             // 예전 방식 아이콘은 모양이 이미 그려져 있으니 그대로
@@ -39,6 +48,27 @@ object MacIcon {
             icon.draw(c)
         }
         return bmp
+    }
+
+    /**
+     * 배경 레이어가 밝은 단색인지 (= 런처가 깔아주는 흰 판 같은 것).
+     * 작게 그려 놓고 모든 픽셀이 밝고 거의 같은 색이면 단색 판으로 본다.
+     */
+    private fun isPlainLight(layer: Drawable): Boolean {
+        val probe = Bitmap.createBitmap(12, 12, Bitmap.Config.ARGB_8888)
+        layer.setBounds(0, 0, 12, 12)
+        layer.draw(Canvas(probe))
+        val pixels = IntArray(144).also { probe.getPixels(it, 0, 12, 0, 0, 12, 12) }
+        probe.recycle()
+        val first = pixels[0]
+        return pixels.all { p ->
+            val r = (p shr 16) and 0xFF
+            val g = (p shr 8) and 0xFF
+            val b = p and 0xFF
+            val light = (r + g + b) / 3 >= 225
+            val same = abs(r - ((first shr 16) and 0xFF)) + abs(g - ((first shr 8) and 0xFF)) + abs(b - (first and 0xFF)) < 30
+            light && same
+        }
     }
 
     /** macOS Big Sur 아이콘 모양에 가까운 초타원(n=5) */
