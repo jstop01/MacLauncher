@@ -24,6 +24,7 @@ class FinderOpenActivity : Activity() {
     companion object {
         const val EXTRA_PATH = "path"
         const val EXTRA_IS_DIR = "is_dir"
+        const val EXTRA_PACKAGE = "package"
         private const val EXTRA_PERMISSION = "permission"
 
         /** 격자 항목용 템플릿. 항목마다 fill-in으로 경로를 채우므로 MUTABLE */
@@ -47,7 +48,10 @@ class FinderOpenActivity : Activity() {
         super.onCreate(savedInstanceState)
         val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         val path = intent.getStringExtra(EXTRA_PATH)
+        val app = intent.getStringExtra(EXTRA_PACKAGE)
         when {
+            app != null -> packageManager.getLaunchIntentForPackage(app)
+                ?.let { runCatching { startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } }
             intent.getBooleanExtra(EXTRA_PERMISSION, false) -> requestAccess(widgetId)
             path == null -> Unit
             intent.getBooleanExtra(EXTRA_IS_DIR, false) -> FinderWidget.go(this, widgetId, path)

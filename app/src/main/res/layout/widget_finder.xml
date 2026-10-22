@@ -80,6 +80,10 @@
                 style="@style/FinderSideItem"
                 android:text="최근 항목" />
             <TextView
+                android:id="@+id/side_apps"
+                style="@style/FinderSideItem"
+                android:text="응용 프로그램" />
+            <TextView
                 android:id="@+id/side_download"
                 style="@style/FinderSideItem"
                 android:text="다운로드" />

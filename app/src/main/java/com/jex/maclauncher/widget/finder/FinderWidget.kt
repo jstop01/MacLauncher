@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.WidgetSize
+import com.jex.maclauncher.widget.apps.AppCatalog
 
 /**
  * macOS Finder 위젯. 사이드바로 위치를 고르고, 격자에서 폴더를 누르면 들어가고 파일을 누르면 연다.
@@ -68,7 +69,8 @@ class FinderWidget : AppWidgetProvider() {
         fun refresh(context: Context, id: Int) {
             val manager = AppWidgetManager.getInstance(context)
             val location = location(context, id)
-            val access = FinderFiles.hasAccess(context)
+            // 앱 목록은 파일 권한이 필요 없음
+            val access = location == FinderFiles.APPS || FinderFiles.hasAccess(context)
             val views = RemoteViews(context.packageName, R.layout.widget_finder)
 
             views.setTextViewText(R.id.finder_title, FinderFiles.title(location))
@@ -95,7 +97,11 @@ class FinderWidget : AppWidgetProvider() {
                 views.setEmptyView(R.id.finder_grid, R.id.finder_empty)
                 views.setPendingIntentTemplate(R.id.finder_grid, FinderOpenActivity.template(context, id))
                 views.setViewVisibility(R.id.finder_permission, View.GONE)
-                views.setTextViewText(R.id.finder_footer, FinderFiles.freeSpace())
+                views.setTextViewText(
+                    R.id.finder_footer,
+                    if (location == FinderFiles.APPS) "${AppCatalog.list(context, AppCatalog.Section.ALL).size}개 앱"
+                    else FinderFiles.freeSpace(),
+                )
             } else {
                 views.setViewVisibility(R.id.finder_grid, View.GONE)
                 views.setViewVisibility(R.id.finder_empty, View.GONE)

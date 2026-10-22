@@ -18,6 +18,8 @@ data class FinderItem(val file: File, val isDir: Boolean)
 object FinderFiles {
 
     const val RECENT = "recent"
+    /** 응용 프로그램: 파일 대신 설치된 앱을 보여주는 위치 */
+    const val APPS = "apps"
     private const val RECENT_LIMIT = 60
     private const val MAX_ITEMS = 300
 
@@ -27,6 +29,7 @@ object FinderFiles {
     val sidebar: List<Triple<Int, String, String>>
         get() = listOf(
             Triple(R.id.side_recent, "최근 항목", RECENT),
+            Triple(R.id.side_apps, "응용 프로그램", APPS),
             Triple(R.id.side_download, "다운로드", dir(Environment.DIRECTORY_DOWNLOADS)),
             Triple(R.id.side_documents, "문서", dir(Environment.DIRECTORY_DOCUMENTS)),
             Triple(R.id.side_photos, "사진", dir(Environment.DIRECTORY_DCIM)),
@@ -51,7 +54,7 @@ object FinderFiles {
 
     /** 뒤로: 상위 폴더. 최근 항목이나 저장소 맨 위에선 null */
     fun parent(location: String): String? {
-        if (location == RECENT || location == root.path) return null
+        if (location == RECENT || location == APPS || location == root.path) return null
         return File(location).parentFile?.path?.takeIf { it.startsWith(root.path) }
     }
 
