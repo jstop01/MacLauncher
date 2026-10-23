@@ -70,6 +70,15 @@ class FinderWidget : AppWidgetProvider() {
         private const val KEY_MINIMIZED = "minimized_"
         private const val KEY_ZOOMED = "zoomed_"
         private const val KEY_MINI_POSITION = "mini_position"
+        private const val KEY_MINI_ICON = "mini_icon"
+
+        /** 🟡 최소화 때 아이콘을 남길지 (끄면 완전히 사라지고 Dock의 Finder나 빈자리 탭으로 펼침) */
+        fun miniIconEnabled(context: Context) = prefs(context).getBoolean(KEY_MINI_ICON, true)
+
+        fun setMiniIconEnabled(context: Context, on: Boolean) {
+            prefs(context).edit().putBoolean(KEY_MINI_ICON, on).apply()
+            refreshAll(context)
+        }
 
         /**
          * 최소화 아이콘 위치: 0~8 (왼쪽 위부터 가로로 3칸씩, 4 = 가운데). 모든 Finder 위젯 공통.
@@ -152,7 +161,10 @@ class FinderWidget : AppWidgetProvider() {
             val minimized = prefs(context).getBoolean(KEY_MINIMIZED + id, false)
             val windowParts = intArrayOf(R.id.finder_titlebar, R.id.finder_divider, R.id.finder_body, R.id.finder_footer)
             windowParts.forEach { views.setViewVisibility(it, if (minimized) View.GONE else View.VISIBLE) }
-            views.setViewVisibility(R.id.finder_mini, if (minimized) View.VISIBLE else View.GONE)
+            val showIcon = miniIconEnabled(context)
+            views.setViewVisibility(R.id.finder_mini, if (minimized && showIcon) View.VISIBLE else View.GONE)
+            // 아이콘 없이 접었으면 빈자리 전체를 탭해서 펼침 (Dock이 없어도 갇히지 않게)
+            if (minimized && !showIcon) views.setOnClickPendingIntent(R.id.finder_root, broadcast(context, id, ACTION_MINIMIZE, 14))
             // 펼쳐 있을 땐 내용이 꽉 차서 영향 없고, 최소화일 때 아이콘이 9칸 중 어디에 붙을지만 정함
             views.setInt(R.id.finder_root, "setGravity", miniGravity(miniPosition(context)))
             views.setInt(

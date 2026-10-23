@@ -45,6 +45,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -120,6 +121,8 @@ class MainActivity : ComponentActivity() {
                 if (pickingFinderMini) {
                     MiniPositionPicker(
                         current = FinderWidget.miniPosition(this),
+                        iconOn = FinderWidget.miniIconEnabled(this),
+                        onIconToggle = { FinderWidget.setMiniIconEnabled(this, it) },
                         onPick = {
                             FinderWidget.setMiniPosition(this, it)
                             pickingFinderMini = false
@@ -368,17 +371,33 @@ private fun BackupPanel() {
 
 /** 최소화 아이콘 위치 9칸 (위젯 모양의 3x3 격자) */
 @Composable
-private fun MiniPositionPicker(current: Int, onPick: (Int) -> Unit, onDismiss: () -> Unit) {
+private fun MiniPositionPicker(
+    current: Int,
+    iconOn: Boolean,
+    onIconToggle: (Boolean) -> Unit,
+    onPick: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var showIcon by remember { mutableStateOf(iconOn) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("최소화 아이콘 위치") },
         text = {
             Column {
-                Text("Finder를 🟡로 접었을 때 아이콘이 남을 자리를 골라요. 화면 아래쪽에 놓은 위젯이면 아래 줄을 고르면 위로 열리는 느낌이 나요.", fontSize = 13.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("최소화하면 아이콘 남기기", fontSize = 15.sp, modifier = Modifier.weight(1f))
+                    Switch(checked = showIcon, onCheckedChange = { showIcon = it; onIconToggle(it) })
+                }
+                Text(
+                    if (showIcon) "Finder를 🟡로 접었을 때 아이콘이 남을 자리를 골라요. 화면 아래쪽에 놓은 위젯이면 아래 줄을 고르면 위로 열리는 느낌이 나요."
+                    else "🟡로 접으면 Finder가 완전히 사라져요. Dock의 Finder 아이콘이나 Finder가 있던 자리를 탭하면 다시 펼쳐져요.",
+                    fontSize = 13.sp,
+                )
                 Spacer(Modifier.height(16.dp))
                 Column(
                     Modifier
                         .fillMaxWidth()
+                        .alpha(if (showIcon) 1f else 0.35f)
                         .aspectRatio(1.3f)
                         .background(Color(0xFF1E1E20), RoundedCornerShape(16.dp))
                         .padding(8.dp),
@@ -394,7 +413,7 @@ private fun MiniPositionPicker(current: Int, onPick: (Int) -> Unit, onDismiss: (
                                         .fillMaxHeight()
                                         .padding(4.dp)
                                         .background(if (selected) Color(0xFF0A84FF) else Color(0xFF2C2C2E), RoundedCornerShape(10.dp))
-                                        .clickable { onPick(pos) },
+                                        .clickable(enabled = showIcon) { onPick(pos) },
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Image(
