@@ -32,7 +32,7 @@ SKIP_LAYOUTS = {"widget_sticky", "widget_photo"}
 # 라이트 버전이 필요한 드로어블 (흰색/어두운 패널을 쓰는 것만)
 DRAWABLES = [
     "widget_bg", "dock_bg", "finder_sidebar_bg", "finder_side_selected", "widget_divider",
-    "ic_add_tile", "ic_media_play", "ic_media_pause", "ic_media_next", "ic_media_prev", "ic_bat_phone", "ic_bat_headphones", "ic_bat_watch", "ic_bat_device",
+    "ic_add_tile", "ic_media_play", "ic_media_pause", "ic_media_next", "ic_media_prev", "ic_timer_cancel", "ic_bat_phone", "ic_bat_headphones", "ic_bat_watch", "ic_bat_device",
 ]
 
 # 레이아웃에서 쓰는 위젯 스타일 → 라이트 스타일(이름.Light)

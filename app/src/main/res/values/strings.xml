@@ -33,4 +33,6 @@
     <string name="widget_screentime_description">오늘 사용 시간과 많이 쓴 앱을 보여주는 macOS 스타일 스크린 타임</string>
     <string name="widget_shortcuts_title">단축어</string>
     <string name="widget_shortcuts_description">손전등·와이파이·타이머 등을 알록달록한 타일로 바로 실행</string>
+    <string name="widget_timer_title">타이머</string>
+    <string name="widget_timer_description">위젯에서 바로 시작하는 macOS 스타일 타이머</string>
 </resources>

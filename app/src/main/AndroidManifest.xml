@@ -21,6 +21,11 @@
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+    <!-- 타이머 위젯: 끝나는 순간 정확히 깨어나 알림 -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
     <!-- 사진 위젯 -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- 달력 위젯: 일정 표시 -->
@@ -357,6 +362,18 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".widget.TimerWidget"
+            android:exported="false"
+            android:label="@string/widget_timer_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_timer_info" />
+        </receiver>
 
         <receiver
             android:name=".widget.BootReceiver"

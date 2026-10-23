@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
+<!-- macOS 타이머: 주황 링 + 남은 시간(Chronometer가 스스로 줄어듦) + 시작/일시정지/취소 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tm_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg_light"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <FrameLayout
+        android:id="@+id/tm_face"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/tm_ring"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <Chronometer
+                android:id="@+id/tm_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:countDown="true"
+                android:textColor="#1C1C1E"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tm_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#8E8E93"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- 멈춰 있을 때: 빠른 시작 -->
+    <LinearLayout
+        android:id="@+id/tm_presets"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+            <TextView android:id="@+id/tm_preset1" style="@style/TmChip" android:text="1분" />
+            <TextView android:id="@+id/tm_preset5" style="@style/TmChip" android:text="5분" />
+            <TextView android:id="@+id/tm_preset10" style="@style/TmChip" android:text="10분" />
+            <TextView android:id="@+id/tm_preset25" style="@style/TmChip" android:text="25분" />
+    </LinearLayout>
+
+    <!-- 도는 중/일시정지: 일시정지·이어하기 / 취소 -->
+    <LinearLayout
+        android:id="@+id/tm_controls"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView android:id="@+id/tm_cancel" style="@style/TmButton" android:src="@drawable/ic_timer_cancel_light" android:contentDescription="취소" />
+        <ImageView android:id="@+id/tm_toggle" style="@style/TmButton" android:src="@drawable/ic_media_pause_light" android:contentDescription="일시정지/이어하기" />
+    </LinearLayout>
+</LinearLayout>

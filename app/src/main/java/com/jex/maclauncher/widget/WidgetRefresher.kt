@@ -16,6 +16,7 @@ object WidgetRefresher {
     fun all(context: Context, pending: BroadcastReceiver.PendingResult? = null) {
         CalendarWidget.updateAll(context)
         ClockWidget.updateAll(context)
+        TimerWidget.updateAll(context)
         ShortcutsWidget.updateAll(context)
         ScreenTimeWidget.refreshAll(context)
         MusicWidget.updateAll(context)

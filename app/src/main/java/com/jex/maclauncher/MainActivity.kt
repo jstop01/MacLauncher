@@ -66,6 +66,7 @@ import com.jex.maclauncher.widget.MonitorService
 import com.jex.maclauncher.widget.MonitorWidget
 import com.jex.maclauncher.widget.PhotoWidget
 import com.jex.maclauncher.widget.StorageWidget
+import com.jex.maclauncher.widget.TimerWidget
 import com.jex.maclauncher.widget.WeatherWidget
 import com.jex.maclauncher.widget.WidgetRefresher
 import com.jex.maclauncher.widget.WidgetTheme
@@ -166,6 +167,10 @@ class MainActivity : ComponentActivity() {
             "시계",
             "Mac 아날로그 시계예요. 작게 놓으면 시계 하나, 넓게 놓으면 서울·뉴욕·런던·도쿄 세계 시계가 돼요. 탭하면 알람 앱이 열려요.",
         ) { pin(ClockWidget::class.java) },
+        WidgetCardSpec(
+            "타이머",
+            "Mac 시계 타이머처럼 주황 링에 남은 시간을 보여줘요. 위젯에서 바로 1·5·10·25분을 시작하고 일시정지·취소할 수 있고, 끝나면 알람 소리로 알려줘요.",
+        ) { pin(TimerWidget::class.java) },
         WidgetCardSpec(
             "달력",
             "◀ ▶로 달을 넘기고, 일정이 있는 날엔 점이 찍혀요. 작게 놓으면 다음 일정 2개를 보여줘요. 일정을 보려면 캘린더 권한이 필요해요.",
