@@ -163,6 +163,7 @@ class FinderWidget : AppWidgetProvider() {
             windowParts.forEach { views.setViewVisibility(it, if (minimized) View.GONE else View.VISIBLE) }
             val showIcon = miniIconEnabled(context)
             views.setViewVisibility(R.id.finder_mini, if (minimized && showIcon) View.VISIBLE else View.GONE)
+            if (minimized && showIcon) FinderIcon.apply(context, views, R.id.finder_mini)
             // 아이콘 없이 접었으면 빈자리 전체를 탭해서 펼침 (Dock이 없어도 갇히지 않게)
             if (minimized && !showIcon) views.setOnClickPendingIntent(R.id.finder_root, broadcast(context, id, ACTION_MINIMIZE, 14))
             // 펼쳐 있을 땐 내용이 꽉 차서 영향 없고, 최소화일 때 아이콘이 9칸 중 어디에 붙을지만 정함

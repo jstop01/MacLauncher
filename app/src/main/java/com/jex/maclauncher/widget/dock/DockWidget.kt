@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.finder.FinderIcon
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.backup.WidgetBackup
 import com.jex.maclauncher.widget.WidgetTheme
@@ -94,7 +95,7 @@ class DockWidget : AppWidgetProvider() {
             // macOS처럼 맨 왼쪽에 Finder: 누르면 홈의 Finder 위젯을 최소화/펼침 (Finder 위젯이 있을 때만)
             if (FinderWidget.hasWidgets(context)) {
                 val finder = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_dock_item))
-                finder.setImageViewResource(R.id.dock_icon, R.drawable.ic_finder_face)
+                FinderIcon.apply(context, finder, R.id.dock_icon)
                 finder.setContentDescription(R.id.dock_icon, "Finder")
                 finder.setViewVisibility(R.id.dock_dot, if (FinderWidget.anyOpen(context)) View.VISIBLE else View.GONE)
                 finder.setOnClickPendingIntent(

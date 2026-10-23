@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 앱 아이콘 전경: 파랑/흰색 반반의 웃는 얼굴 (직접 그림). 108dp 전체를 채우고, 런처가 가운데를 원하는 모양으로 자름 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#EEF2F7" android:pathData="M0,0 L108,0 L108,108 L0,108 Z" />
+    <!-- 왼쪽 파란 면: 이마 → 코 → 입술 → 턱 옆얼굴 선 (64dp 판을 18dp 띄워 72dp 크기로) -->
+    <path android:fillColor="#2F8CF0"
+        android:pathData="M0,0 L58.5,0 L58.5,18 C56.25,29.25 54,38.25 52.9,47.25 C51.75,52.9 48.4,56.25 47.25,59.6 C50.6,60.75 52.9,61.9 52.9,64.1 C52.9,69.75 55.1,78.75 57.4,90 L57.4,108 L0,108 Z" />
+    <path android:fillColor="#1C1C1E" android:pathData="M38.25,38.25 m-2.25,0 a2.25,2.25 0 0,1 4.5,0 l0,7.9 a2.25,2.25 0 0,1 -4.5,0 Z" />
+    <path android:fillColor="#1C1C1E" android:pathData="M67.5,38.25 m-2.25,0 a2.25,2.25 0 0,1 4.5,0 l0,7.9 a2.25,2.25 0 0,1 -4.5,0 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#1C1C1E" android:strokeWidth="2.9" android:strokeLineCap="round"
+        android:pathData="M33.75,67.5 C42.75,75.4 65.25,75.4 74.25,67.5" />
+</vector>

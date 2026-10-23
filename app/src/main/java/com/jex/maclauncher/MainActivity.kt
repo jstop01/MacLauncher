@@ -56,6 +56,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jex.maclauncher.ui.theme.MacLauncherTheme
+import com.jex.maclauncher.widget.finder.FinderIcon
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.activity.result.PickVisualMediaRequest
+import android.graphics.Bitmap
 import com.jex.maclauncher.backup.WidgetBackup
 import java.util.Locale
 import java.util.Date
@@ -114,6 +120,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         // 앱 화면(포그라운드)에서는 서비스 시작이 항상 허용됨
         if (MonitorService.needed(this)) MonitorService.start(this)
+        finderIcon = FinderIcon.custom(this)
         handlePermissionRequest(intent)
         setContent {
             MacLauncherTheme {
@@ -123,6 +130,12 @@ class MainActivity : ComponentActivity() {
                         current = FinderWidget.miniPosition(this),
                         iconOn = FinderWidget.miniIconEnabled(this),
                         onIconToggle = { FinderWidget.setMiniIconEnabled(this, it) },
+                        customIcon = finderIcon,
+                        onPickIcon = { finderIconPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        onResetIcon = {
+                            FinderIcon.clear(this)
+                            finderIcon = null
+                        },
                         onPick = {
                             FinderWidget.setMiniPosition(this, it)
                             pickingFinderMini = false
@@ -148,7 +161,7 @@ class MainActivity : ComponentActivity() {
         WidgetCardSpec(
             "Finder",
             "폴더를 탭하면 위젯 안에서 들어가고, 파일을 탭하면 바로 열려요. 🟡 최소화, 🟢 최대화. 처음 한 번 '모든 파일 접근' 권한을 켜야 합니다 (위젯을 탭하면 설정으로 이동).",
-            secondary = "아이콘 위치" to { pickingFinderMini = true },
+            secondary = "아이콘 설정" to { pickingFinderMini = true },
         ) { pin(FinderWidget::class.java) },
         WidgetCardSpec(
             "응용 프로그램",
@@ -225,6 +238,14 @@ class MainActivity : ComponentActivity() {
 
     /** Finder 🟡 최소화 아이콘 위치 고르기 창 */
     private var pickingFinderMini by mutableStateOf(false)
+
+    /** 사용자가 등록한 Finder 아이콘 (없으면 기본 웃는 얼굴) */
+    private var finderIcon by mutableStateOf<Bitmap?>(null)
+    private val finderIconPicker = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri == null) return@registerForActivityResult
+        if (FinderIcon.set(this, uri)) finderIcon = FinderIcon.custom(this)
+        else Toast.makeText(this, "이미지를 불러오지 못했어요", Toast.LENGTH_SHORT).show()
+    }
 
     // 권한 창과 위젯 추가 창이 겹치지 않게, 권한 응답 뒤에 추가 창을 띄운다 (거부해도 위젯은 추가)
     private var pinAfterGrant: Class<*>? = null
@@ -375,13 +396,16 @@ private fun MiniPositionPicker(
     current: Int,
     iconOn: Boolean,
     onIconToggle: (Boolean) -> Unit,
+    customIcon: Bitmap?,
+    onPickIcon: () -> Unit,
+    onResetIcon: () -> Unit,
     onPick: (Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var showIcon by remember { mutableStateOf(iconOn) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("최소화 아이콘 위치") },
+        title = { Text("Finder 최소화 아이콘") },
         text = {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -393,7 +417,16 @@ private fun MiniPositionPicker(
                     else "🟡로 접으면 Finder가 완전히 사라져요. Dock의 Finder 아이콘이나 Finder가 있던 자리를 탭하면 다시 펼쳐져요.",
                     fontSize = 13.sp,
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
+                // 아이콘 모양: 기본(직접 그린 웃는 얼굴) 또는 사용자가 고른 이미지
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    FinderIconPreview(customIcon, Modifier.size(44.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text(if (customIcon != null) "내 이미지" else "기본 아이콘", fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    if (customIcon != null) TextButton(onClick = onResetIcon) { Text("기본으로") }
+                    TextButton(onClick = onPickIcon) { Text("이미지 고르기") }
+                }
+                Spacer(Modifier.height(12.dp))
                 Column(
                     Modifier
                         .fillMaxWidth()
@@ -416,10 +449,7 @@ private fun MiniPositionPicker(
                                         .clickable(enabled = showIcon) { onPick(pos) },
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    Image(
-                                        painterResource(R.drawable.ic_finder_face), contentDescription = null,
-                                        modifier = Modifier.size(28.dp).alpha(if (selected) 1f else 0.35f),
-                                    )
+                                    FinderIconPreview(customIcon, Modifier.size(28.dp).alpha(if (selected) 1f else 0.35f))
                                 }
                             }
                         }
@@ -429,6 +459,12 @@ private fun MiniPositionPicker(
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text("닫기") } },
     )
+}
+
+@Composable
+private fun FinderIconPreview(custom: Bitmap?, modifier: Modifier) {
+    if (custom != null) Image(custom.asImageBitmap(), contentDescription = null, modifier = modifier.clip(RoundedCornerShape(22)))
+    else Image(painterResource(R.drawable.ic_finder_face), contentDescription = null, modifier = modifier)
 }
 
 @Composable
