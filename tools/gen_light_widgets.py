@@ -36,7 +36,7 @@ DRAWABLES = [
 ]
 
 # 레이아웃에서 쓰는 위젯 스타일 → 라이트 스타일(이름.Light)
-STYLES = ["CalCell", "CalEvent", "MusicButton", "FinderSideHeader", "FinderSideItem", "StorageRow", "StorageLabel", "StorageValue"]
+STYLES = ["CalCell", "CalEvent", "MusicButton", "StAppName", "StAppTime", "FinderSideHeader", "FinderSideItem", "StorageRow", "StorageLabel", "StorageValue"]
 
 HEADER = "<!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->\n"
 

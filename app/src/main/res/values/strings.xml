@@ -29,4 +29,6 @@
     <string name="widget_music_title">지금 재생 중</string>
     <string name="widget_music_description">재생 중인 음악의 앨범 아트·제목과 재생 버튼</string>
     <string name="music_listener_label">Mac 위젯 음악 정보</string>
+    <string name="widget_screentime_title">스크린 타임</string>
+    <string name="widget_screentime_description">오늘 사용 시간과 많이 쓴 앱을 보여주는 macOS 스타일 스크린 타임</string>
 </resources>

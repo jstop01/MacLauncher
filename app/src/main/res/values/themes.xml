@@ -35,6 +35,24 @@
         <item name="android:scaleType">fitCenter</item>
     </style>
 
+    <!-- 스크린 타임 앱 줄 -->
+    <style name="StAppName">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="StAppTime">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#99FFFFFF</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
     <!-- Finder 위젯 사이드바 -->
     <style name="FinderSideHeader">
         <item name="android:layout_width">match_parent</item>

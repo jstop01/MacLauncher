@@ -74,6 +74,7 @@ import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.widget.music.MusicWidget
+import com.jex.maclauncher.widget.screentime.ScreenTimeWidget
 import com.jex.maclauncher.widget.reminders.RemindersWidget
 import com.jex.maclauncher.widget.sticky.StickyWidget
 
@@ -132,6 +133,7 @@ class MainActivity : ComponentActivity() {
         FinderWidget.refreshAll(this)
         StorageWidget.refreshAll(this)
         AppsWidget.refreshAll(this) // 새로 설치/삭제한 앱 반영
+        ScreenTimeWidget.refreshAll(this) // '사용 정보 접근'을 켜고 돌아왔을 수 있음
     }
 
     /** 앱 화면의 위젯 카드 목록 (위에서부터 이 순서로 보임, Finder는 항상 맨 위) */
@@ -149,6 +151,10 @@ class MainActivity : ComponentActivity() {
             "시스템 모니터",
             "CPU · 메모리 사용량을 1초마다 갱신하고, 탭하면 삼성 디바이스 케어(최적화)로 가요. 갱신하는 동안 알림창에 '시스템 모니터' 알림이 떠 있고, 화면이 꺼지면 멈춥니다.",
         ) { pin(MonitorWidget::class.java) },
+        WidgetCardSpec(
+            "스크린 타임",
+            "Mac 스크린 타임처럼 오늘 사용 시간, 시간대별 막대(소셜·엔터테인먼트·기타), 많이 쓴 앱 3개를 보여줘요. 탭하면 새로고침. '사용 정보 접근' 권한이 필요해요.",
+        ) { pin(ScreenTimeWidget::class.java) },
         WidgetCardSpec(
             "시계",
             "Mac 아날로그 시계예요. 작게 놓으면 시계 하나, 넓게 놓으면 서울·뉴욕·런던·도쿄 세계 시계가 돼요. 탭하면 알람 앱이 열려요.",
