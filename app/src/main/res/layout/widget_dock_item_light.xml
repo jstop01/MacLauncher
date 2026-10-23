@@ -13,4 +13,13 @@
         android:layout_gravity="center"
         android:padding="3dp"
         android:scaleType="fitCenter" />
+
+    <!-- macOS Dock처럼 열려 있는 창(펼친 Finder) 아래 작은 점 -->
+    <ImageView
+        android:id="@+id/dock_dot"
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:src="@drawable/dock_dot"
+        android:visibility="gone" />
 </FrameLayout>

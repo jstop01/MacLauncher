@@ -15,6 +15,7 @@ import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.WidgetTheme
 import com.jex.maclauncher.widget.WidgetSize
 import com.jex.maclauncher.widget.apps.AppCatalog
+import com.jex.maclauncher.widget.dock.DockWidget
 
 /**
  * macOS Finder 위젯. 사이드바로 위치를 고르고, 격자에서 폴더를 누르면 들어가고 파일을 누르면 연다.
@@ -38,12 +39,17 @@ class FinderWidget : AppWidgetProvider() {
             ACTION_GO -> intent.getStringExtra(EXTRA_LOCATION)?.let { go(context, id, it) }
             ACTION_BACK -> FinderFiles.parent(location(context, id))?.let { go(context, id, it) }
             ACTION_REFRESH -> refresh(context, id)
-            ACTION_MINIMIZE -> toggle(context, KEY_MINIMIZED + id).also { refresh(context, id) }
+            ACTION_MINIMIZE -> {
+                toggle(context, KEY_MINIMIZED + id)
+                refresh(context, id)
+                DockWidget.updateAll(context)   // Dock의 Finder 점
+            }
             ACTION_ZOOM -> toggle(context, KEY_ZOOMED + id).also { refresh(context, id) }
             // 닫기: 즐겨찾는 앱 첫 화면으로, 펼친 상태로
             ACTION_CLOSE -> {
                 prefs(context).edit().remove(KEY_MINIMIZED + id).remove(KEY_ZOOMED + id).apply()
                 go(context, id, FinderFiles.FAVORITES)
+                DockWidget.updateAll(context)
             }
         }
     }
@@ -89,6 +95,23 @@ class FinderWidget : AppWidgetProvider() {
         private const val KEY_LOCATION = "location_"
 
         private fun prefs(context: Context) = context.getSharedPreferences("finder_widget", Context.MODE_PRIVATE)
+
+        /** 펼쳐진 Finder 위젯이 하나라도 있는지 (Dock의 점) */
+        fun anyOpen(context: Context): Boolean =
+            ids(context).any { !prefs(context).getBoolean(KEY_MINIMIZED + it, false) }
+
+        fun hasWidgets(context: Context) = ids(context).isNotEmpty()
+
+        /** Dock의 Finder 아이콘: 하나라도 펼쳐져 있으면 모두 최소화, 모두 접혀 있으면 모두 펼침 */
+        fun toggleAll(context: Context) {
+            val minimize = anyOpen(context)
+            prefs(context).edit().apply { ids(context).forEach { putBoolean(KEY_MINIMIZED + it, minimize) } }.apply()
+            refreshAll(context)
+            DockWidget.updateAll(context)
+        }
+
+        private fun ids(context: Context): IntArray =
+            AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, FinderWidget::class.java))
 
         private fun toggle(context: Context, key: String) {
             val p = prefs(context)

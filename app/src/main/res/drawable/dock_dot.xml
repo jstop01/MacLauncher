@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dock '실행 중' 점 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="#CCFFFFFF" />
+    <size android:width="4dp" android:height="4dp" />
+</shape>

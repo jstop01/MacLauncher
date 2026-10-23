@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.backup.WidgetBackup
 import com.jex.maclauncher.widget.WidgetTheme
 
@@ -20,12 +21,18 @@ class DockWidget : AppWidgetProvider() {
         ids.forEach { update(context, manager, it) }
     }
 
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        if (intent.action == ACTION_FINDER) FinderWidget.toggleAll(context)
+    }
+
     override fun onDeleted(context: Context, ids: IntArray) {
         prefs(context).edit().apply { ids.forEach { remove(KEY_APPS + it) } }.apply()
     }
 
     companion object {
         const val MAX_APPS = 10
+        private const val ACTION_FINDER = "com.jex.maclauncher.dock.FINDER"
         private const val KEY_APPS = "apps_"
         private const val ICON_PX = 112   // 위젯 갱신 한 번에 넘기는 크기 제한(~1MB) 안에 10개가 들어가도록
 
@@ -84,6 +91,21 @@ class DockWidget : AppWidgetProvider() {
             views.removeAllViews(R.id.dock_icons)
 
             var shown = 0
+            // macOS처럼 맨 왼쪽에 Finder: 누르면 홈의 Finder 위젯을 최소화/펼침 (Finder 위젯이 있을 때만)
+            if (FinderWidget.hasWidgets(context)) {
+                val finder = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_dock_item))
+                finder.setImageViewResource(R.id.dock_icon, R.drawable.ic_finder_face)
+                finder.setContentDescription(R.id.dock_icon, "Finder")
+                finder.setViewVisibility(R.id.dock_dot, if (FinderWidget.anyOpen(context)) View.VISIBLE else View.GONE)
+                finder.setOnClickPendingIntent(
+                    R.id.dock_icon,
+                    PendingIntent.getBroadcast(
+                        context, 0, Intent(context, DockWidget::class.java).setAction(ACTION_FINDER),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    ),
+                )
+                views.addView(R.id.dock_icons, finder)
+            }
             apps(context, id).forEachIndexed { i, pkg ->
                 // 지워진 앱은 건너뜀
                 val launch = pm.getLaunchIntentForPackage(pkg) ?: return@forEachIndexed
