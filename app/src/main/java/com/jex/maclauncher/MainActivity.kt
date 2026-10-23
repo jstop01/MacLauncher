@@ -75,6 +75,8 @@ import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.widget.music.MusicWidget
 import com.jex.maclauncher.widget.screentime.ScreenTimeWidget
+import com.jex.maclauncher.widget.shortcuts.ShortcutsConfigActivity
+import com.jex.maclauncher.widget.shortcuts.ShortcutsWidget
 import com.jex.maclauncher.widget.reminders.RemindersWidget
 import com.jex.maclauncher.widget.sticky.StickyWidget
 
@@ -156,6 +158,11 @@ class MainActivity : ComponentActivity() {
             "Mac 스크린 타임처럼 오늘 사용 시간, 시간대별 막대(소셜·엔터테인먼트·기타), 많이 쓴 앱 3개를 보여줘요. 탭하면 새로고침. '사용 정보 접근' 권한이 필요해요.",
         ) { pin(ScreenTimeWidget::class.java) },
         WidgetCardSpec(
+            "단축어",
+            "Mac 단축어처럼 알록달록한 타일로 손전등·와이파이·블루투스·카메라·타이머·녹음·계산기·소리/진동 등을 바로 실행해요. 손전등과 소리/진동은 앱을 열지 않고 바로 바뀌어요.",
+            secondary = "타일 고르기" to ::editShortcuts,
+        ) { pin(ShortcutsWidget::class.java) },
+        WidgetCardSpec(
             "시계",
             "Mac 아날로그 시계예요. 작게 놓으면 시계 하나, 넓게 놓으면 서울·뉴욕·런던·도쿄 세계 시계가 돼요. 탭하면 알람 앱이 열려요.",
         ) { pin(ClockWidget::class.java) },
@@ -232,6 +239,16 @@ class MainActivity : ComponentActivity() {
             PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_CANCEL_CURRENT, options,
         )
         AppWidgetManager.getInstance(this).requestPinAppWidget(ComponentName(this, DockWidget::class.java), null, pickApps)
+    }
+
+    /** 이미 놓은 단축어 위젯의 타일 다시 고르기 (여러 개면 가장 최근 것) */
+    private fun editShortcuts() {
+        val ids = AppWidgetManager.getInstance(this).getAppWidgetIds(ComponentName(this, ShortcutsWidget::class.java))
+        if (ids.isEmpty()) {
+            Toast.makeText(this, "먼저 단축어 위젯을 홈 화면에 추가하세요", Toast.LENGTH_SHORT).show()
+            return
+        }
+        startActivity(ShortcutsConfigActivity.intent(this, ids.max()))
     }
 
     /** 이미 놓은 Dock의 앱 다시 고르기 (여러 개면 가장 최근 것) */

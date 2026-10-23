@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- macOS 단축어: 알록달록한 타일 2열 x 최대 4줄 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sc_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="8dp">
+        <LinearLayout
+            android:id="@+id/sc_row0"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <FrameLayout android:id="@+id/sc_tile0" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg0" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon0" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label0" style="@style/ScLabel" />
+            </FrameLayout>
+            <FrameLayout android:id="@+id/sc_tile1" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg1" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon1" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label1" style="@style/ScLabel" />
+            </FrameLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/sc_row1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <FrameLayout android:id="@+id/sc_tile2" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg2" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon2" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label2" style="@style/ScLabel" />
+            </FrameLayout>
+            <FrameLayout android:id="@+id/sc_tile3" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg3" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon3" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label3" style="@style/ScLabel" />
+            </FrameLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/sc_row2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <FrameLayout android:id="@+id/sc_tile4" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg4" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon4" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label4" style="@style/ScLabel" />
+            </FrameLayout>
+            <FrameLayout android:id="@+id/sc_tile5" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg5" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon5" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label5" style="@style/ScLabel" />
+            </FrameLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/sc_row3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <FrameLayout android:id="@+id/sc_tile6" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg6" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon6" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label6" style="@style/ScLabel" />
+            </FrameLayout>
+            <FrameLayout android:id="@+id/sc_tile7" style="@style/ScTile">
+                <ImageView android:id="@+id/sc_bg7" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:src="@drawable/sc_tile_bg" />
+                <ImageView android:id="@+id/sc_icon7" android:layout_width="22dp" android:layout_height="22dp" android:layout_margin="10dp" />
+                <TextView android:id="@+id/sc_label7" style="@style/ScLabel" />
+            </FrameLayout>
+        </LinearLayout>
+</LinearLayout>
