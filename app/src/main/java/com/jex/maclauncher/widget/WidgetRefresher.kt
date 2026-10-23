@@ -6,6 +6,7 @@ import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.widget.music.MusicWidget
+import com.jex.maclauncher.widget.network.NetworkWidget
 import com.jex.maclauncher.widget.screentime.ScreenTimeWidget
 import com.jex.maclauncher.widget.shortcuts.ShortcutsWidget
 import com.jex.maclauncher.widget.reminders.RemindersWidget
@@ -28,6 +29,7 @@ object WidgetRefresher {
         BatteryWidget.updateAll(context)
         WeatherWidget.updateAll(context)
         MonitorWidget.updateAll(context)
+        NetworkWidget.updateAll(context)
         PhotoWidget.refreshAll(context, keepPhoto = true)
         StorageWidget.refreshAll(context, pending)
     }

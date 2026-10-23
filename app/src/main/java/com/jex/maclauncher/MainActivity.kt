@@ -75,6 +75,7 @@ import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.widget.music.MusicWidget
+import com.jex.maclauncher.widget.network.NetworkWidget
 import com.jex.maclauncher.widget.screentime.ScreenTimeWidget
 import com.jex.maclauncher.widget.shortcuts.ShortcutsConfigActivity
 import com.jex.maclauncher.widget.shortcuts.ShortcutsWidget
@@ -111,7 +112,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // 앱 화면(포그라운드)에서는 서비스 시작이 항상 허용됨
-        if (MonitorWidget.hasWidgets(this)) MonitorService.start(this)
+        if (MonitorService.needed(this)) MonitorService.start(this)
         handlePermissionRequest(intent)
         setContent {
             MacLauncherTheme {
@@ -163,6 +164,10 @@ class MainActivity : ComponentActivity() {
             "Mac 단축어처럼 알록달록한 타일로 손전등·와이파이·블루투스·카메라·타이머·녹음·계산기·소리/진동 등을 바로 실행해요. 손전등과 소리/진동은 앱을 열지 않고 바로 바뀌어요.",
             secondary = "타일 고르기" to ::editShortcuts,
         ) { pin(ShortcutsWidget::class.java) },
+        WidgetCardSpec(
+            "네트워크",
+            "Mac iStat처럼 실시간 다운로드·업로드 속도와 60초 그래프, 연결 종류(Wi-Fi·모바일), 오늘 데이터 사용량을 보여줘요. 시스템 모니터와 같은 1초 갱신을 써요.",
+        ) { pin(NetworkWidget::class.java) },
         WidgetCardSpec(
             "시계",
             "Mac 아날로그 시계예요. 작게 놓으면 시계 하나, 넓게 놓으면 서울·뉴욕·런던·도쿄 세계 시계가 돼요. 탭하면 알람 앱이 열려요.",

@@ -22,6 +22,8 @@ import com.jex.maclauncher.R
 import com.jex.maclauncher.system.CpuReader
 import com.jex.maclauncher.system.MemInfo
 import com.jex.maclauncher.system.MemReader
+import com.jex.maclauncher.widget.network.NetworkStats
+import com.jex.maclauncher.widget.network.NetworkWidget
 
 data class MonitorState(
     val cpu: Float = 0f,                 // 0..1
@@ -50,6 +52,9 @@ class MonitorService : Service() {
         var running = false
             private set
 
+        /** 이 서비스가 필요한 위젯(시스템 모니터, 네트워크)이 하나라도 있는지 */
+        fun needed(context: Context) = MonitorWidget.hasWidgets(context) || NetworkWidget.hasWidgets(context)
+
         /** 백그라운드에서 막히면(Android 12+) false. 위젯 탭이나 앱 화면에서 다시 시작하면 된다. */
         fun start(context: Context): Boolean = runCatching {
             ContextCompat.startForegroundService(context, Intent(context, MonitorService::class.java))
@@ -62,12 +67,14 @@ class MonitorService : Service() {
 
     private val tick = object : Runnable {
         override fun run() {
-            if (!MonitorWidget.hasWidgets(this@MonitorService)) {
+            if (!needed(this@MonitorService)) {
                 stopSelf()
                 return
             }
             sample()
+            NetworkStats.sample()
             MonitorWidget.updateAll(this@MonitorService)
+            NetworkWidget.updateAll(this@MonitorService)
             // 배터리는 천천히 변하니 30초마다만 (배터리 위젯은 자체 갱신이 30분 간격이라 여기서 보강)
             if (++ticks % 30 == 0) BatteryWidget.updateAll(this@MonitorService)
             handler.postDelayed(this, 1000)
@@ -103,6 +110,7 @@ class MonitorService : Service() {
         unregisterReceiver(screenReceiver)
         running = false
         MonitorWidget.updateAll(this) // "탭하면 실시간 갱신 시작" 표시
+        NetworkWidget.updateAll(this)
         super.onDestroy()
     }
 
