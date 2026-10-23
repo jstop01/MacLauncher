@@ -11,6 +11,7 @@ import android.content.Intent
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         TimerWidget.restore(context, rebooted = intent.action == Intent.ACTION_BOOT_COMPLETED)
+        CalendarWidget.resetMonth(context)
         WidgetRefresher.all(context, goAsync())
         if (MonitorService.needed(context)) MonitorService.start(context)
     }

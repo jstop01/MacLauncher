@@ -414,7 +414,7 @@ private fun MiniPositionPicker(
                 }
                 Text(
                     if (showIcon) "Finder를 🟡로 접었을 때 아이콘이 남을 자리를 골라요. 화면 아래쪽에 놓은 위젯이면 아래 줄을 고르면 위로 열리는 느낌이 나요."
-                    else "🟡로 접으면 Finder가 완전히 사라져요. Dock의 Finder 아이콘이나 Finder가 있던 자리를 탭하면 다시 펼쳐져요.",
+                    else "🟡로 접으면 Finder가 완전히 사라지고, 아래에 겹쳐 둔 위젯도 그대로 누를 수 있어요. Dock의 Finder 아이콘을 누르면 다시 펼쳐져요.",
                     fontSize = 13.sp,
                 )
                 Spacer(Modifier.height(12.dp))

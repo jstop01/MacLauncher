@@ -12,12 +12,26 @@ android {
         applicationId = "com.jex.maclauncher"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1"
+        versionCode = 3
+        versionName = "1.1.0"
+    }
+
+    // 배포 서명: 키와 비밀번호는 ~/.gradle/gradle.properties 에만 (저장소에 넣지 않음)
+    val storeFilePath = providers.gradleProperty("MACLAUNCHER_STORE_FILE").orNull
+    signingConfigs {
+        if (storeFilePath != null) {
+            create("release") {
+                storeFile = file(storeFilePath)
+                storePassword = providers.gradleProperty("MACLAUNCHER_STORE_PASSWORD").get()
+                keyAlias = providers.gradleProperty("MACLAUNCHER_KEY_ALIAS").get()
+                keyPassword = providers.gradleProperty("MACLAUNCHER_KEY_PASSWORD").get()
+            }
+        }
     }
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -45,7 +59,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons)
     // 배터리 위젯: 블루투스 기기 배터리(BluetoothDevice.getBatteryLevel, 숨은 API) 읽기
     implementation(libs.hiddenapibypass)
     debugImplementation(libs.androidx.ui.tooling)

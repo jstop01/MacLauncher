@@ -46,6 +46,8 @@ class CalendarWidget : AppWidgetProvider() {
                 update(context, AppWidgetManager.getInstance(context), id)
             }
             ACTION_MIDNIGHT, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_PROVIDER_CHANGED -> {
+                // 날이 바뀌면 넘겨 보던 달도 이번 달로
+                if (intent.action == ACTION_MIDNIGHT) resetMonth(context)
                 updateAll(context)
                 scheduleMidnight(context)
             }
@@ -90,6 +92,11 @@ class CalendarWidget : AppWidgetProvider() {
         private fun prefs(context: Context) = context.getSharedPreferences("calendar_widget", Context.MODE_PRIVATE)
 
         private fun monthOffset(context: Context, id: Int) = prefs(context).getInt(KEY_OFFSET + id, 0)
+
+        /** 모든 달력을 이번 달로 (자정, 재부팅·앱 업데이트 때). 다시 그리는 건 부른 쪽에서 */
+        fun resetMonth(context: Context) {
+            prefs(context).edit().apply { prefs(context).all.keys.filter { it.startsWith(KEY_OFFSET) }.forEach { remove(it) } }.apply()
+        }
 
         private fun update(context: Context, manager: AppWidgetManager, id: Int) {
             val size = WidgetSize.of(manager, id)
