@@ -47,7 +47,8 @@ object NetworkStats {
     /** "Wi-Fi" / "모바일 데이터" / "이더넷" / "연결 안 됨" */
     fun connection(context: Context): String {
         val cm = context.getSystemService(ConnectivityManager::class.java)
-        val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return "연결 안 됨"
+        // 1초마다 불리는 곳이라 실패해도 위젯/서비스가 죽지 않게
+        val caps = runCatching { cm.getNetworkCapabilities(cm.activeNetwork) }.getOrNull() ?: return "연결 안 됨"
         return when {
             caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "Wi-Fi"
             caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "모바일 데이터"

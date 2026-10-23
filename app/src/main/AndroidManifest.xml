@@ -26,6 +26,8 @@
     <uses-permission
         android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32" />
+    <!-- 네트워크 위젯: 연결 종류(Wi-Fi/모바일) -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- 사진 위젯 -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- 달력 위젯: 일정 표시 -->
