@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 날씨 작은 크기: 아이콘 + 기온 + 도시 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/wx_small_root"
+<!-- 날씨 작은 크기: 아이콘 + 기온 + 도시. 배경·글자색은 Skin 팩이 런타임에 입힌다. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg" />
+
+    <LinearLayout
+        android:id="@+id/wx_small_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="12dp">
 
     <ImageView
         android:id="@+id/wx_small_icon"
@@ -34,4 +44,5 @@
         android:ellipsize="end"
         android:textColor="#99FFFFFF"
         android:textSize="12sp" />
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

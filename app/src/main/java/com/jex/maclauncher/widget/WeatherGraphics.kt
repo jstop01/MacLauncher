@@ -7,6 +7,7 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
+import com.jex.maclauncher.widget.skin.SkinPack
 
 /**
  * 날씨 상태 아이콘을 코드로 그린다 (해·달·구름·비·눈·안개·뇌우).
@@ -56,8 +57,10 @@ object WeatherGraphics {
     private fun moonColor(light: Boolean) = if (light) 0xFFB9A94C.toInt() else 0xFFE8DB90.toInt()
     private fun snowColor(light: Boolean) = if (light) 0xFF8E99AC.toInt() else 0xFFEAF2FF.toInt()
 
-    /** 상태 아이콘 한 장. px 정사각형, 가장자리 여백 포함. */
-    fun bitmap(sky: Sky, isDay: Boolean, px: Int, light: Boolean): Bitmap {
+    /** 상태 아이콘 한 장. px 정사각형, 가장자리 여백 포함. 색은 감성 팩을 따른다. */
+    fun bitmap(sky: Sky, isDay: Boolean, px: Int, pack: SkinPack): Bitmap {
+        val light = pack.isLight
+        // (추후: pack.icon.strokeScale / saturation / shadow 를 선 두께·채도에 반영)
         val bmp = Bitmap.createBitmap(px, px, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         val p = Paint(Paint.ANTI_ALIAS_FLAG)

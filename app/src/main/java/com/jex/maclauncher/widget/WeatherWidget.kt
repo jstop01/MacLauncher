@@ -18,6 +18,8 @@ import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.MainActivity
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.skin.Skin
+import com.jex.maclauncher.widget.skin.SkinPack
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -116,14 +118,24 @@ class WeatherWidget : AppWidgetProvider() {
 
         private fun views(context: Context, weather: Weather?, city: String?, granted: Boolean, size: WidgetSize): RemoteViews {
             val small = size.narrowerThan(200) || size.shorterThan(170)
-            val light = WidgetTheme.isLight(context)
-            return if (small) smallViews(context, weather, city, granted, light)
-            else largeViews(context, weather, city, granted, light, size)
+            val pack = Skin.current(context)
+            return if (small) smallViews(context, weather, city, granted, pack, size)
+            else largeViews(context, weather, city, granted, pack, size)
         }
 
-        private fun largeViews(context: Context, weather: Weather?, city: String?, granted: Boolean, light: Boolean, size: WidgetSize): RemoteViews {
-            val v = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_weather))
+        private fun largeViews(context: Context, weather: Weather?, city: String?, granted: Boolean, pack: SkinPack, size: WidgetSize): RemoteViews {
+            val v = RemoteViews(context.packageName, R.layout.widget_weather)
+            Skin.applyPanel(context, v, R.id.skin_bg, pack, size)
             v.setOnClickPendingIntent(R.id.wx_root, click(context, granted))
+
+            // 글자색은 팩 팔레트로 (레이아웃은 색 없는 뼈대 한 벌)
+            val text = pack.palette.text
+            val sub = pack.palette.subText
+            v.setTextColor(R.id.wx_city, text)
+            v.setTextColor(R.id.wx_cond, sub)
+            v.setTextColor(R.id.wx_temp, text)
+            v.setTextColor(R.id.wx_hilo, sub)
+            v.setTextColor(R.id.wx_hint, sub)
             v.setTextViewText(R.id.wx_city, city ?: "현재 위치")
 
             if (!granted) {
@@ -131,7 +143,7 @@ class WeatherWidget : AppWidgetProvider() {
                 v.setTextViewText(R.id.wx_cond, "날씨를 보려면 위치 권한이 필요해요")
                 v.setTextViewText(R.id.wx_temp, "--°")
                 v.setTextViewText(R.id.wx_hilo, "")
-                v.setImageViewBitmap(R.id.wx_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 64), light))
+                v.setImageViewBitmap(R.id.wx_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 64), pack))
                 SLOTS.forEach { v.setViewVisibility(it, View.GONE) }
                 return v
             }
@@ -141,7 +153,7 @@ class WeatherWidget : AppWidgetProvider() {
                 v.setTextViewText(R.id.wx_cond, "불러오는 중…")
                 v.setTextViewText(R.id.wx_temp, "--°")
                 v.setTextViewText(R.id.wx_hilo, "")
-                v.setImageViewBitmap(R.id.wx_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 64), light))
+                v.setImageViewBitmap(R.id.wx_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 64), pack))
                 SLOTS.forEach { v.setViewVisibility(it, View.GONE) }
                 return v
             }
@@ -151,7 +163,7 @@ class WeatherWidget : AppWidgetProvider() {
             weather.days.firstOrNull()?.let { v.setTextViewText(R.id.wx_hilo, "최고 ${it.hi}°  최저 ${it.lo}°") }
             v.setImageViewBitmap(
                 R.id.wx_icon,
-                WeatherGraphics.bitmap(WeatherGraphics.sky(weather.code), weather.isDay, iconPx(context, 64), light),
+                WeatherGraphics.bitmap(WeatherGraphics.sky(weather.code), weather.isDay, iconPx(context, 64), pack),
             )
 
             val shown = weather.days.take(SLOTS.size)
@@ -162,34 +174,40 @@ class WeatherWidget : AppWidgetProvider() {
                     return@forEachIndexed
                 }
                 v.setViewVisibility(slot, View.VISIBLE)
+                v.setTextColor(DAYS[i], sub)
+                v.setTextColor(DHIS[i], text)
+                v.setTextColor(DLOS[i], sub)
                 v.setTextViewText(DAYS[i], d.label)
                 v.setTextViewText(DHIS[i], "${d.hi}°")
                 v.setTextViewText(DLOS[i], "${d.lo}°")
-                v.setImageViewBitmap(DICONS[i], WeatherGraphics.bitmap(WeatherGraphics.sky(d.code), true, iconPx(context, 30), light))
+                v.setImageViewBitmap(DICONS[i], WeatherGraphics.bitmap(WeatherGraphics.sky(d.code), true, iconPx(context, 30), pack))
             }
             return v
         }
 
-        private fun smallViews(context: Context, weather: Weather?, city: String?, granted: Boolean, light: Boolean): RemoteViews {
-            val v = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_weather_small))
+        private fun smallViews(context: Context, weather: Weather?, city: String?, granted: Boolean, pack: SkinPack, size: WidgetSize): RemoteViews {
+            val v = RemoteViews(context.packageName, R.layout.widget_weather_small)
+            Skin.applyPanel(context, v, R.id.skin_bg, pack, size)
             v.setOnClickPendingIntent(R.id.wx_small_root, click(context, granted))
+            v.setTextColor(R.id.wx_small_temp, pack.palette.text)
+            v.setTextColor(R.id.wx_small_city, pack.palette.subText)
             when {
                 !granted -> {
                     v.setTextViewText(R.id.wx_small_temp, "--°")
                     v.setTextViewText(R.id.wx_small_city, "탭해서 권한 허용")
-                    v.setImageViewBitmap(R.id.wx_small_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 72), light))
+                    v.setImageViewBitmap(R.id.wx_small_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 72), pack))
                 }
                 weather == null -> {
                     v.setTextViewText(R.id.wx_small_temp, "--°")
                     v.setTextViewText(R.id.wx_small_city, "불러오는 중…")
-                    v.setImageViewBitmap(R.id.wx_small_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 72), light))
+                    v.setImageViewBitmap(R.id.wx_small_icon, WeatherGraphics.bitmap(WeatherGraphics.Sky.CLOUDY, true, iconPx(context, 72), pack))
                 }
                 else -> {
                     v.setTextViewText(R.id.wx_small_temp, "${weather.temp}°")
                     v.setTextViewText(R.id.wx_small_city, city ?: WeatherGraphics.describe(weather.code))
                     v.setImageViewBitmap(
                         R.id.wx_small_icon,
-                        WeatherGraphics.bitmap(WeatherGraphics.sky(weather.code), weather.isDay, iconPx(context, 72), light),
+                        WeatherGraphics.bitmap(WeatherGraphics.sky(weather.code), weather.isDay, iconPx(context, 72), pack),
                     )
                 }
             }

@@ -21,11 +21,12 @@ object WidgetTheme {
         val panel: Int,    // 패널 바탕색 (막대 구간 사이 틈)
     )
 
-    private val DARK = Palette(
+    // Skin 팩에서도 재사용 (마이그레이션 중 공용 팔레트)
+    val DARK = Palette(
         text = 0xFFFFFFFF.toInt(), subText = 0x99FFFFFF.toInt(), dim = 0x59FFFFFF,
         track = 0xFF3A3A3C.toInt(), grid = 0x1FFFFFFF, panel = 0xFF1E1E20.toInt(),
     )
-    private val LIGHT = Palette(
+    val LIGHT = Palette(
         text = 0xFF1C1C1E.toInt(), subText = 0xFF8E8E93.toInt(), dim = 0xFFC7C7CC.toInt(),
         track = 0xFFE5E5EA.toInt(), grid = 0x1F000000, panel = 0xFFF6F6F8.toInt(),
     )
@@ -45,8 +46,7 @@ object WidgetTheme {
             R.layout.widget_reminders_item to R.layout.widget_reminders_item_light,
             R.layout.widget_reminders to R.layout.widget_reminders_light,
             R.layout.widget_storage to R.layout.widget_storage_light,
-            R.layout.widget_weather to R.layout.widget_weather_light,
-            R.layout.widget_weather_small to R.layout.widget_weather_small_light,
+            // 날씨 위젯은 Skin 팩(런타임 색/배경)으로 전환되어 _light 레이아웃을 쓰지 않는다.
     )
 
     private val LIGHT_DRAWABLES = mapOf(
