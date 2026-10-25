@@ -6,6 +6,7 @@ import android.content.Context
 import android.net.Uri
 import com.jex.maclauncher.widget.WidgetRefresher
 import com.jex.maclauncher.widget.WidgetTheme
+import com.jex.maclauncher.widget.skin.SkinPrefs
 import com.jex.maclauncher.widget.dock.DockWidget
 import com.jex.maclauncher.widget.finder.FinderWidget
 import com.jex.maclauncher.widget.sticky.StickyColor
@@ -34,6 +35,7 @@ object WidgetBackup {
             .put("version", VERSION)
             .put("app", "mac-widgets")
             .put("theme_light", WidgetTheme.isLight(context))
+            .put("skin_pack", SkinPrefs.selectedId(context))
             .put("finder_favorites", raw(context, "finder_favorites", "favorites"))
             .put("finder_mini_position", FinderWidget.miniPosition(context))
             .put("reminders", raw(context, "reminders", "items"))
@@ -55,6 +57,7 @@ object WidgetBackup {
 
         // 위젯 id와 상관없는 것들은 그대로
         WidgetTheme.setLightQuietly(context, json.optBoolean("theme_light"))
+        json.optString("skin_pack").takeIf { it.isNotEmpty() }?.let { SkinPrefs.selectQuietly(context, it) }
         json.optString("finder_favorites").takeIf { it.isNotEmpty() }?.let { setRaw(context, "finder_favorites", "favorites", it) }
         json.optString("reminders").takeIf { it.isNotEmpty() }?.let { setRaw(context, "reminders", "items", it) }
         if (json.has("finder_mini_position")) FinderWidget.setMiniPositionQuietly(context, json.getInt("finder_mini_position"))

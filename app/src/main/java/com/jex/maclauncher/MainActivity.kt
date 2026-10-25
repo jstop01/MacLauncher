@@ -17,6 +17,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.material3.AlertDialog
@@ -77,6 +81,10 @@ import com.jex.maclauncher.widget.TimerWidget
 import com.jex.maclauncher.widget.WeatherWidget
 import com.jex.maclauncher.widget.WidgetRefresher
 import com.jex.maclauncher.widget.WidgetTheme
+import com.jex.maclauncher.widget.skin.PanelStyle
+import com.jex.maclauncher.widget.skin.Skin
+import com.jex.maclauncher.widget.skin.SkinPack
+import com.jex.maclauncher.widget.skin.SkinPrefs
 import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
@@ -337,6 +345,8 @@ private fun WidgetGuide(cards: List<WidgetCardSpec>) {
             Spacer(Modifier.height(20.dp))
             ThemePicker()
             Spacer(Modifier.height(12.dp))
+            SkinPicker()
+            Spacer(Modifier.height(12.dp))
             BackupPanel()
             cards.forEach { card ->
                 Spacer(Modifier.height(12.dp))
@@ -498,6 +508,71 @@ private fun ThemePicker() {
             }
         }
     }
+}
+
+/** 날씨 위젯에 입힐 감성 팩 고르기 (마이그레이션 중: 지금은 날씨 위젯만 지원) */
+@Composable
+private fun SkinPicker() {
+    val context = LocalContext.current
+    var selected by remember { mutableStateOf(SkinPrefs.selectedId(context)) }
+    Column(
+        Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(18.dp),
+    ) {
+        Text("날씨 위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+        Text("날씨 위젯에 입힐 감성을 골라요. 지금은 날씨 위젯만 지원하고, 점점 다른 위젯으로 넓힐 거예요.", color = Sub, fontSize = 13.sp)
+        Spacer(Modifier.height(14.dp))
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+            SkinSwatch("자동", null, selected == SkinPrefs.AUTO) {
+                selected = SkinPrefs.AUTO
+                SkinPrefs.select(context, SkinPrefs.AUTO)
+            }
+            Skin.BUILTIN.forEach { pack ->
+                Spacer(Modifier.width(14.dp))
+                SkinSwatch(pack.name, pack, selected == pack.id) {
+                    selected = pack.id
+                    SkinPrefs.select(context, pack.id)
+                }
+            }
+        }
+    }
+}
+
+/** 감성 스와치 한 칸: 팩 배경색 미리보기 + 이름. pack=null이면 '자동(테마 따름)'. */
+@Composable
+private fun SkinSwatch(label: String, pack: SkinPack?, selected: Boolean, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick),
+    ) {
+        Box(
+            Modifier
+                .size(58.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(pack?.previewBrush() ?: SolidColor(Color(0xFF3A3A3C)))
+                .border(
+                    if (selected) 2.5.dp else 1.dp,
+                    if (selected) Color(0xFF0A84FF) else Color(0x33FFFFFF),
+                    RoundedCornerShape(14.dp),
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (pack == null) Text("A", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            label,
+            color = if (selected) Color.White else Sub,
+            fontSize = 12.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        )
+    }
+}
+
+/** 팩 배경을 스와치용 Compose Brush로. 위젯에 실제로 깔리는 SkinGraphics와 같은 색을 쓴다. */
+private fun SkinPack.previewBrush(): Brush = when (val s = panel) {
+    is PanelStyle.Solid -> SolidColor(Color(s.color))
+    is PanelStyle.Gradient -> Brush.verticalGradient(listOf(Color(s.from), Color(s.to)))
+    is PanelStyle.Glass -> SolidColor(Color(s.tint))
 }
 
 @Composable

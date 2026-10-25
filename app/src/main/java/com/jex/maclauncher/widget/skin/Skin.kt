@@ -38,10 +38,61 @@ object Skin {
         cornerRadiusDp = 20f,
     )
 
-    /** 내장 팩 (무료). 추후 프리미엄 팩은 IAP 해금 후 여기에 합쳐 노출. */
-    val BUILTIN = listOf(MAC_DARK, MAC_LIGHT)
+    // ── 여기부터는 "새 감성 = 데이터 하나"의 증명. 레이아웃·코드 추가 없이 아래 객체만으로 다른 감성이 뜬다. ──
 
-    fun current(context: Context): SkinPack = if (WidgetTheme.isLight(context)) MAC_LIGHT else MAC_DARK
+    /** 선셋: 주황→마젠타 그라데이션. 채도 높아 흰 글씨가 잘 읽힌다. */
+    val SUNSET = SkinPack(
+        id = "sunset",
+        name = "선셋",
+        tier = Tier.FREE,
+        isLight = false,
+        palette = WidgetTheme.DARK,
+        accent = 0xFFFFD166.toInt(),
+        panel = PanelStyle.Gradient(from = 0xFFFF512F.toInt(), to = 0xFFDD2476.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
+        icon = IconStyle(),
+        cornerRadiusDp = 24f,
+    )
+
+    /** 오션 글래스: 반투명 짙은 청록 유리. */
+    val OCEAN_GLASS = SkinPack(
+        id = "ocean_glass",
+        name = "오션 글래스",
+        tier = Tier.FREE,
+        isLight = false,
+        palette = WidgetTheme.DARK,
+        accent = 0xFF4AD7D1.toInt(),
+        panel = PanelStyle.Glass(tint = 0xFF0A4A6B.toInt(), alpha = 0xD9, stroke = 0x40FFFFFF),
+        icon = IconStyle(),
+        cornerRadiusDp = 22f,
+    )
+
+    /** 버블껌: 파스텔 핑크→민트. 밝은 배경이라 어두운 글씨(라이트 팔레트). */
+    val BUBBLEGUM = SkinPack(
+        id = "bubblegum",
+        name = "버블껌",
+        tier = Tier.FREE,
+        isLight = true,
+        palette = WidgetTheme.LIGHT,
+        accent = 0xFFFF4D8D.toInt(),
+        panel = PanelStyle.Gradient(from = 0xFFFFDEE9.toInt(), to = 0xFFB5FFFC.toInt(), angleDeg = 90f, stroke = 0x1A000000),
+        icon = IconStyle(),
+        cornerRadiusDp = 24f,
+    )
+
+    /** 내장 팩 (무료). 추후 프리미엄 팩은 IAP 해금 후 여기에 합쳐 노출. */
+    val BUILTIN = listOf(MAC_DARK, MAC_LIGHT, SUNSET, OCEAN_GLASS, BUBBLEGUM)
+
+    fun byId(id: String): SkinPack? = BUILTIN.firstOrNull { it.id == id }
+
+    /**
+     * 지금 적용할 팩. 선택이 [SkinPrefs.AUTO]면 기존 라이트/다크 토글을 따르고,
+     * 특정 팩을 골랐으면 그 팩을 쓴다(없어진 id면 테마 기본으로 폴백).
+     */
+    fun current(context: Context): SkinPack {
+        val themeDefault = if (WidgetTheme.isLight(context)) MAC_LIGHT else MAC_DARK
+        val id = SkinPrefs.selectedId(context)
+        return if (id == SkinPrefs.AUTO) themeDefault else byId(id) ?: themeDefault
+    }
 
     /** 레이아웃 맨 밑 skin_bg(ImageView)에 팩 배경 비트맵을 깐다. */
     fun applyPanel(context: Context, views: RemoteViews, bgId: Int, pack: SkinPack, size: WidgetSize) {
