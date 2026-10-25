@@ -53,11 +53,11 @@ object Skin {
         cornerRadiusDp = 24f,
     )
 
-    /** 오션 글래스: 반투명 짙은 청록 유리. */
+    /** 오션 글래스: 반투명 짙은 청록 유리. (프리미엄) */
     val OCEAN_GLASS = SkinPack(
         id = "ocean_glass",
         name = "오션 글래스",
-        tier = Tier.FREE,
+        tier = Tier.PREMIUM,
         isLight = false,
         palette = WidgetTheme.DARK,
         accent = 0xFF4AD7D1.toInt(),
@@ -66,11 +66,11 @@ object Skin {
         cornerRadiusDp = 22f,
     )
 
-    /** 버블껌: 파스텔 핑크→민트. 밝은 배경이라 어두운 글씨(라이트 팔레트). */
+    /** 버블껌: 파스텔 핑크→민트. 밝은 배경이라 어두운 글씨(라이트 팔레트). (프리미엄) */
     val BUBBLEGUM = SkinPack(
         id = "bubblegum",
         name = "버블껌",
-        tier = Tier.FREE,
+        tier = Tier.PREMIUM,
         isLight = true,
         palette = WidgetTheme.LIGHT,
         accent = 0xFFFF4D8D.toInt(),
@@ -86,12 +86,15 @@ object Skin {
 
     /**
      * 지금 적용할 팩. 선택이 [SkinPrefs.AUTO]면 기존 라이트/다크 토글을 따르고,
-     * 특정 팩을 골랐으면 그 팩을 쓴다(없어진 id면 테마 기본으로 폴백).
+     * 특정 팩을 골랐으면 그 팩을 쓴다. 없어진 id이거나 프리미엄인데 해금 안 됐으면
+     * (예: 다른 기기에서 백업 복원) 테마 기본으로 폴백한다.
      */
     fun current(context: Context): SkinPack {
         val themeDefault = if (WidgetTheme.isLight(context)) MAC_LIGHT else MAC_DARK
         val id = SkinPrefs.selectedId(context)
-        return if (id == SkinPrefs.AUTO) themeDefault else byId(id) ?: themeDefault
+        if (id == SkinPrefs.AUTO) return themeDefault
+        val pack = byId(id) ?: return themeDefault
+        return if (Entitlements.isUnlocked(context, pack)) pack else themeDefault
     }
 
     /** 레이아웃 맨 밑 skin_bg(ImageView)에 팩 배경 비트맵을 깐다. */

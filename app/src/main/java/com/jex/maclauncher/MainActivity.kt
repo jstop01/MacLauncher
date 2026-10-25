@@ -81,10 +81,13 @@ import com.jex.maclauncher.widget.TimerWidget
 import com.jex.maclauncher.widget.WeatherWidget
 import com.jex.maclauncher.widget.WidgetRefresher
 import com.jex.maclauncher.widget.WidgetTheme
+import com.jex.maclauncher.widget.skin.Entitlements
 import com.jex.maclauncher.widget.skin.PanelStyle
 import com.jex.maclauncher.widget.skin.Skin
+import com.jex.maclauncher.widget.skin.SkinBilling
 import com.jex.maclauncher.widget.skin.SkinPack
 import com.jex.maclauncher.widget.skin.SkinPrefs
+import com.jex.maclauncher.widget.skin.Tier
 import com.jex.maclauncher.widget.apps.AppsWidget
 import com.jex.maclauncher.widget.dock.DockConfigActivity
 import com.jex.maclauncher.widget.dock.DockWidget
@@ -343,8 +346,6 @@ private fun WidgetGuide(cards: List<WidgetCardSpec>) {
                 color = Sub, fontSize = 14.sp,
             )
             Spacer(Modifier.height(20.dp))
-            ThemePicker()
-            Spacer(Modifier.height(12.dp))
             SkinPicker()
             Spacer(Modifier.height(12.dp))
             BackupPanel()
@@ -477,69 +478,101 @@ private fun FinderIconPreview(custom: Bitmap?, modifier: Modifier) {
     else Image(painterResource(R.drawable.ic_finder_face), contentDescription = null, modifier = modifier)
 }
 
-@Composable
-private fun ThemePicker() {
-    val context = LocalContext.current
-    var light by remember { mutableStateOf(WidgetTheme.isLight(context)) }
-    Row(
-        Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(horizontal = 18.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text("위젯 테마", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-            Text("바꾸면 홈 화면의 위젯이 모두 바로 바뀌어요", color = Sub, fontSize = 13.sp)
-        }
-        Row(Modifier.background(Color(0xFF2C2C2E), RoundedCornerShape(10.dp)).padding(3.dp)) {
-            listOf(false to "다크", true to "라이트").forEach { (value, label) ->
-                val selected = light == value
-                Text(
-                    label,
-                    color = if (selected) Color.White else Sub,
-                    fontSize = 14.sp,
-                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                    modifier = Modifier
-                        .background(if (selected) Color(0xFF636366) else Color.Transparent, RoundedCornerShape(8.dp))
-                        .clickable {
-                            light = value
-                            WidgetTheme.setLight(context, value)
-                        }
-                        .padding(horizontal = 16.dp, vertical = 7.dp),
-                )
-            }
-        }
-    }
-}
-
-/** 날씨 위젯에 입힐 감성 팩 고르기 (마이그레이션 중: 지금은 날씨 위젯만 지원) */
+/**
+ * 위젯 감성(테마) 고르기. 다크/라이트도 팩(맥 다크·맥 라이트)으로 통합됐다.
+ * 팩을 고르면 아직 이관 안 된 위젯이 밝기라도 따라오게 WidgetTheme.isLight도 맞춘다.
+ * 프리미엄 팩은 자물쇠로 표시하고 탭하면 구매 안내를 띄운다.
+ */
 @Composable
 private fun SkinPicker() {
     val context = LocalContext.current
-    var selected by remember { mutableStateOf(SkinPrefs.selectedId(context)) }
+    var version by remember { mutableStateOf(0) }
+    val currentId = remember(version) { Skin.current(context).id }
+    val unlocked = remember(version) { Entitlements.unlockedIds(context) }
+    var purchasing by remember { mutableStateOf<SkinPack?>(null) }
+
+    fun apply(pack: SkinPack) {
+        // 아직 이관 안 된 위젯(배터리·달력 등)이 밝기라도 맞게 isLight 동기화
+        WidgetTheme.setLightQuietly(context, pack.isLight)
+        SkinPrefs.select(context, pack.id)  // 내부에서 WidgetRefresher.all 호출
+        version++
+    }
+
     Column(
         Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(18.dp),
     ) {
         Text("위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-        Text("위젯에 입힐 감성을 골라요. 지금은 날씨·시계 위젯이 지원하고, 점점 다른 위젯으로 넓힐 거예요.", color = Sub, fontSize = 13.sp)
+        Text("홈 화면 위젯의 감성을 골라요. 바꾸면 바로 적용돼요. (지금은 날씨·시계가 감성을 따르고, 점점 넓혀가요)", color = Sub, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
-            SkinSwatch("자동", null, selected == SkinPrefs.AUTO) {
-                selected = SkinPrefs.AUTO
-                SkinPrefs.select(context, SkinPrefs.AUTO)
-            }
-            Skin.BUILTIN.forEach { pack ->
-                Spacer(Modifier.width(14.dp))
-                SkinSwatch(pack.name, pack, selected == pack.id) {
-                    selected = pack.id
-                    SkinPrefs.select(context, pack.id)
+            Skin.BUILTIN.forEachIndexed { i, pack ->
+                if (i > 0) Spacer(Modifier.width(14.dp))
+                val locked = pack.tier == Tier.PREMIUM && pack.id !in unlocked
+                SkinSwatch(pack, selected = pack.id == currentId, locked = locked) {
+                    if (locked) purchasing = pack else apply(pack)
                 }
             }
         }
     }
+
+    purchasing?.let { pack ->
+        PremiumDialog(
+            pack = pack,
+            onDismiss = { purchasing = null },
+            onPurchase = {
+                SkinBilling.purchase(context, pack) { result ->
+                    when (result) {
+                        is SkinBilling.Result.Purchased -> { version++; apply(pack); purchasing = null }
+                        is SkinBilling.Result.Canceled -> purchasing = null
+                        is SkinBilling.Result.Unavailable ->
+                            Toast.makeText(context, result.reason, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            onDebugUnlock = {
+                if (SkinBilling.debugUnlock(context, pack)) { version++; apply(pack); purchasing = null }
+            },
+            debug = SkinBilling.isDebug(context),
+        )
+    }
 }
 
-/** 감성 스와치 한 칸: 팩 배경색 미리보기 + 이름. pack=null이면 '자동(테마 따름)'. */
+/** 프리미엄 팩 구매 안내 */
 @Composable
-private fun SkinSwatch(label: String, pack: SkinPack?, selected: Boolean, onClick: () -> Unit) {
+private fun PremiumDialog(
+    pack: SkinPack,
+    onDismiss: () -> Unit,
+    onPurchase: () -> Unit,
+    onDebugUnlock: () -> Unit,
+    debug: Boolean,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("‘${pack.name}’ 프리미엄 감성") },
+        text = {
+            Column {
+                Box(
+                    Modifier.fillMaxWidth().height(90.dp).clip(RoundedCornerShape(14.dp)).background(pack.previewBrush()),
+                )
+                Spacer(Modifier.height(12.dp))
+                Text("구매하면 로그인한 Google 계정의 모든 기기에서 쓸 수 있어요.", fontSize = 14.sp)
+                if (debug) {
+                    Spacer(Modifier.height(8.dp))
+                    Text("(디버그 빌드: 결제 없이 ‘바로 해금’으로 테스트할 수 있어요)", color = Sub, fontSize = 12.sp)
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onPurchase) { Text("구매") } },
+        dismissButton = {
+            if (debug) TextButton(onClick = onDebugUnlock) { Text("바로 해금") }
+            else TextButton(onClick = onDismiss) { Text("닫기") }
+        },
+    )
+}
+
+/** 감성 스와치 한 칸: 팩 배경색 미리보기 + 이름 (+ 프리미엄 자물쇠). */
+@Composable
+private fun SkinSwatch(pack: SkinPack, selected: Boolean, locked: Boolean, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable(onClick = onClick),
@@ -548,7 +581,7 @@ private fun SkinSwatch(label: String, pack: SkinPack?, selected: Boolean, onClic
             Modifier
                 .size(58.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(pack?.previewBrush() ?: SolidColor(Color(0xFF3A3A3C)))
+                .background(pack.previewBrush())
                 .border(
                     if (selected) 2.5.dp else 1.dp,
                     if (selected) Color(0xFF0A84FF) else Color(0x33FFFFFF),
@@ -556,11 +589,11 @@ private fun SkinSwatch(label: String, pack: SkinPack?, selected: Boolean, onClic
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            if (pack == null) Text("A", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            if (locked) Text("🔒", fontSize = 18.sp)
         }
         Spacer(Modifier.height(6.dp))
         Text(
-            label,
+            pack.name,
             color = if (selected) Color.White else Sub,
             fontSize = 12.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
