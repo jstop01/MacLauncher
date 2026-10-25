@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 시계 작은 크기: 아날로그 시계 하나 -->
+<!-- 시계 작은 크기: 아날로그 시계 하나. 배경은 Skin 팩이 런타임에 입힌다. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/clk_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:padding="8dp">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg" />
 
     <AnalogClock
         android:id="@+id/clk_face0"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="8dp"
         android:dial="@drawable/clock_dial_fallback"
         android:hand_hour="@drawable/clock_hour"
         android:hand_minute="@drawable/clock_minute" />

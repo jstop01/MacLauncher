@@ -27,8 +27,12 @@ COLORS = [
 ]
 
 # 테마와 상관없는 위젯 (스티커 메모는 메모지 색 그대로)
-# widget_weather*: Skin 팩(런타임 색/배경)으로 전환되어 _light 레이아웃이 필요 없다
-SKIP_LAYOUTS = {"widget_sticky", "widget_photo", "widget_weather", "widget_weather_small"}
+# widget_weather*·widget_clock*: Skin 팩(런타임 색/배경)으로 전환되어 _light 레이아웃이 필요 없다
+SKIP_LAYOUTS = {
+    "widget_sticky", "widget_photo",
+    "widget_weather", "widget_weather_small",
+    "widget_clock", "widget_clock_small",
+}
 
 # 라이트 버전이 필요한 드로어블 (흰색/어두운 패널을 쓰는 것만)
 DRAWABLES = [

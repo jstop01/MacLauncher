@@ -17,6 +17,8 @@ import android.provider.AlarmClock
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.skin.Skin
+import com.jex.maclauncher.widget.skin.SkinPack
 import java.util.TimeZone
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -67,10 +69,12 @@ class ClockWidget : AppWidgetProvider() {
 
         private fun views(context: Context, size: WidgetSize): RemoteViews {
             val world = !size.narrowerThan(250)
+            val pack = Skin.current(context)
             val views = RemoteViews(
                 context.packageName,
-                WidgetTheme.layout(context, if (world) R.layout.widget_clock else R.layout.widget_clock_small),
+                if (world) R.layout.widget_clock else R.layout.widget_clock_small,
             )
+            Skin.applyPanel(context, views, R.id.skin_bg, pack, size)
             val local = TimeZone.getDefault()
             // 지금 시차가 0인 도시(서울 기준 도쿄 등)는 겹쳐 보여서 뺌
             val now = System.currentTimeMillis()
@@ -79,7 +83,7 @@ class ClockWidget : AppWidgetProvider() {
                 .take(if (world) SLOTS.size else 1)
             // 칸이 좁으면 도시 수를 줄임 (한 칸 최소 약 80dp)
             val shown = if (world) cities.take((size.width / 80).coerceIn(2, SLOTS.size)) else cities
-            val face = faceIcons(context, size, if (world) shown.size else 1, world)
+            val face = faceIcons(context, size, if (world) shown.size else 1, world, pack)
 
             shown.forEachIndexed { i, city ->
                 face?.let { f -> f.forEach { (method, icon) -> views.setIcon(FACES[i], method, icon) } }
@@ -88,7 +92,9 @@ class ClockWidget : AppWidgetProvider() {
                 if (world) {
                     views.setViewVisibility(SLOTS[i], View.VISIBLE)
                     views.setTextViewText(CITIES[i], city.name)
+                    views.setTextColor(CITIES[i], pack.palette.text)
                     views.setTextViewText(OFFSETS[i], offset(local, TimeZone.getTimeZone(city.zone)))
+                    views.setTextColor(OFFSETS[i], pack.palette.subText)
                 }
             }
             if (world) for (i in shown.size until SLOTS.size) views.setViewVisibility(SLOTS[i], View.GONE)
@@ -107,7 +113,7 @@ class ClockWidget : AppWidgetProvider() {
          * 다이얼과 바늘을 칸 크기에 맞춘 같은 크기 비트맵으로 (안드로이드 12+).
          * AnalogClock은 그림을 줄이기만 하고 키우지는 않아서, 위젯이 커도 시계가 작게 나오지 않도록.
          */
-        private fun faceIcons(context: Context, size: WidgetSize, count: Int, world: Boolean): List<Pair<String, Icon>>? {
+        private fun faceIcons(context: Context, size: WidgetSize, count: Int, world: Boolean, pack: SkinPack): List<Pair<String, Icon>>? {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null
             val density = context.resources.displayMetrics.density
             val w = if (size.width > 0) size.width else 150
@@ -116,11 +122,12 @@ class ClockWidget : AppWidgetProvider() {
             val dp = if (world) minOf(w / count - 12, h - 24 - 40) else minOf(w, h) - 16
             // 런처가 알려주는 크기가 실제보다 작은 경우가 많아 넉넉히 키움 (AnalogClock이 칸에 맞게 줄여줌)
             val px = (dp * density * 1.4f).roundToInt().coerceIn(160, 560)
-            val p = WidgetTheme.palette(context)
+            val p = pack.palette
             return listOf(
-                "setDial" to Icon.createWithBitmap(dial(context, px)),
+                "setDial" to Icon.createWithBitmap(dial(px, pack)),
                 "setHourHand" to Icon.createWithBitmap(hand(px, 0.50f, 0.055f, p.text)),
                 "setMinuteHand" to Icon.createWithBitmap(hand(px, 0.78f, 0.035f, p.text)),
+                // 초침은 macOS 상징색(주황) 고정 — 팩이 바뀌어도 시계의 정체성 유지
                 "setSecondHand" to Icon.createWithBitmap(hand(px, 0.84f, 0.014f, 0xFFFF9F0A.toInt(), tail = 0.18f, dot = 0.035f)),
             )
         }
@@ -150,10 +157,10 @@ class ClockWidget : AppWidgetProvider() {
             return (if (diffMin > 0) "+" else "") + "${h}시간" + (if (m != 0) " ${m}분" else "")
         }
 
-        /** 숫자 1~12와 분 눈금이 있는 macOS 시계 판 */
-        private fun dial(context: Context, size: Int): Bitmap {
-            val p = WidgetTheme.palette(context)
-            val light = WidgetTheme.isLight(context)
+        /** 숫자 1~12와 분 눈금이 있는 macOS 시계 판. 색은 감성 팩을 따른다. */
+        private fun dial(size: Int, pack: SkinPack): Bitmap {
+            val p = pack.palette
+            val light = pack.isLight
             val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
             val c = Canvas(bmp)
             val r = size / 2f

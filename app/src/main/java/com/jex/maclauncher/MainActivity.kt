@@ -518,8 +518,8 @@ private fun SkinPicker() {
     Column(
         Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(18.dp),
     ) {
-        Text("날씨 위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-        Text("날씨 위젯에 입힐 감성을 골라요. 지금은 날씨 위젯만 지원하고, 점점 다른 위젯으로 넓힐 거예요.", color = Sub, fontSize = 13.sp)
+        Text("위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+        Text("위젯에 입힐 감성을 골라요. 지금은 날씨·시계 위젯이 지원하고, 점점 다른 위젯으로 넓힐 거예요.", color = Sub, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             SkinSwatch("자동", null, selected == SkinPrefs.AUTO) {
