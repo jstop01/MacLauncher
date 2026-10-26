@@ -255,8 +255,11 @@ class WeatherWidget : AppWidgetProvider() {
         }.getOrNull()
 
         private fun fetch(lat: Double, lon: Double): String? {
+            // 날씨엔 동네 수준이면 충분해서 소수 둘째 자리(약 1km)로 줄여 보낸다
+            val la = String.format(Locale.US, "%.2f", lat)
+            val lo = String.format(Locale.US, "%.2f", lon)
             val url = URL(
-                "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon" +
+                "https://api.open-meteo.com/v1/forecast?latitude=$la&longitude=$lo" +
                     "&current=temperature_2m,weather_code,is_day" +
                     "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
                     "&timezone=auto&forecast_days=4",
