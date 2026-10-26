@@ -35,7 +35,7 @@ object SkinBilling {
 
     fun productId(pack: SkinPack) = "skin_${pack.id}"
 
-    private val main = Handler(Looper.getMainLooper())
+    private val main by lazy { Handler(Looper.getMainLooper()) }
     private var client: BillingClient? = null
     private val details = HashMap<String, ProductDetails>()
     private var pending: Pair<String, (Result) -> Unit>? = null  // 진행 중인 구매 (상품 id, 콜백)

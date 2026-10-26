@@ -65,4 +65,5 @@ dependencies {
     implementation(libs.billing.ktx)
     implementation(libs.androidx.fragment)  // billing이 끌어오는 옛 fragment를 올림 (ActivityResult lint)
     debugImplementation(libs.androidx.ui.tooling)
+    testImplementation(libs.junit)
 }

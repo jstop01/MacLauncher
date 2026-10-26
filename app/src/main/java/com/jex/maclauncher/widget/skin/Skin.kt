@@ -54,15 +54,15 @@ object Skin {
         track = 0x26000000, grid = 0x1F000000, panel = panel,
     )
 
-    /** 선셋: 주황→마젠타 그라데이션. 채도 높아 흰 글씨가 잘 읽힌다. */
+    /** 선셋: 노을 주황→마젠타 그라데이션. 흰 글씨 대비 4.5 이상이 되게 주황을 한 톤 낮췄다 (SkinContrastTest). */
     val SUNSET = SkinPack(
         id = "sunset",
         name = "선셋",
         tier = Tier.FREE,
         isLight = false,
-        palette = onColor(0xFFEE3A52.toInt()),
+        palette = onColor(0xFFD63750.toInt()),
         accent = 0xFFFFD166.toInt(),
-        panel = PanelStyle.Gradient(from = 0xFFFF512F.toInt(), to = 0xFFDD2476.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
+        panel = PanelStyle.Gradient(from = 0xFFCF4A2A.toInt(), to = 0xFFDD2476.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
     )
@@ -106,15 +106,15 @@ object Skin {
         cornerRadiusDp = 20f,
     )
 
-    /** 포레스트: 깊은 청록→연두 그라데이션. (프리미엄) */
+    /** 포레스트: 깊은 청록→숲 초록 그라데이션. (프리미엄) */
     val FOREST = SkinPack(
         id = "forest",
         name = "포레스트",
         tier = Tier.PREMIUM,
         isLight = false,
-        palette = onColor(0xFF3F8070.toInt()),
+        palette = onColor(0xFF27685B.toInt()),
         accent = 0xFFFFE08A.toInt(),
-        panel = PanelStyle.Gradient(from = 0xFF134E5E.toInt(), to = 0xFF71B280.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
+        panel = PanelStyle.Gradient(from = 0xFF134E5E.toInt(), to = 0xFF3A8158.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
     )
