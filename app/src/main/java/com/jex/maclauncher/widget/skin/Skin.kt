@@ -66,6 +66,8 @@ object Skin {
         panel = PanelStyle.Gradient(from = 0xFFCF4A2A.toInt(), to = 0xFFDD2476.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
+        red = 0xFFFFC2B8.toInt(),
+        blue = 0xFFC4E2FF.toInt(),
     )
 
     /** 오션 글래스: 반투명 짙은 청록 유리. (프리미엄) */
@@ -79,6 +81,8 @@ object Skin {
         panel = PanelStyle.Glass(tint = 0xFF0A4A6B.toInt(), alpha = 0xD9, stroke = 0x40FFFFFF),
         icon = IconStyle(),
         cornerRadiusDp = 22f,
+        red = 0xFFFFC2B8.toInt(),
+        blue = 0xFFC4E2FF.toInt(),
     )
 
     /** 버블껌: 파스텔 핑크→민트. 밝은 배경이라 어두운 글씨(라이트 팔레트). (프리미엄) */
@@ -92,6 +96,8 @@ object Skin {
         panel = PanelStyle.Gradient(from = 0xFFFFDEE9.toInt(), to = 0xFFB5FFFC.toInt(), angleDeg = 90f, stroke = 0x1A000000),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
+        red = 0xFFD7263D.toInt(),
+        blue = 0xFF1E5FD0.toInt(),
     )
 
     /** 미드나잇: 짙은 남색 단색 + 푸른 테두리. 맥 다크보다 차분한 밤 느낌. */
@@ -118,6 +124,8 @@ object Skin {
         panel = PanelStyle.Gradient(from = 0xFF134E5E.toInt(), to = 0xFF3A8158.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
+        red = 0xFFFFC2B8.toInt(),
+        blue = 0xFFC4E2FF.toInt(),
     )
 
     /** 라벤더: 연보라→하늘 파스텔. 밝은 배경이라 어두운 글씨. (프리미엄) */
@@ -131,6 +139,8 @@ object Skin {
         panel = PanelStyle.Gradient(from = 0xFFE0C3FC.toInt(), to = 0xFF8EC5FC.toInt(), angleDeg = 90f, stroke = 0x1A000000),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
+        red = 0xFFD7263D.toInt(),
+        blue = 0xFF1E5FD0.toInt(),
     )
 
     /** 모노: 순수 검정 + 흰 강조. OLED에서 배경과 하나로 녹는 미니멀. */
@@ -157,6 +167,8 @@ object Skin {
         panel = PanelStyle.Gradient(from = 0xFFF5F7FA.toInt(), to = 0xFFB8C0CC.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
         icon = IconStyle(),
         cornerRadiusDp = 26f,
+        red = 0xFFD7263D.toInt(),
+        blue = 0xFF1E5FD0.toInt(),
     )
 
     /** 말차: 부드러운 녹차 크림→말차 그린. (프리미엄) */
@@ -170,6 +182,8 @@ object Skin {
         panel = PanelStyle.Gradient(from = 0xFFF1F5E1.toInt(), to = 0xFFB5CC8E.toInt(), angleDeg = 90f, stroke = 0x1A000000),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
+        red = 0xFFD7263D.toInt(),
+        blue = 0xFF1E5FD0.toInt(),
     )
 
     /** 피커에 보이는 순서: 무료 먼저, 프리미엄은 해금 전엔 자물쇠 */
@@ -222,27 +236,33 @@ object Skin {
         return views
     }
 
-    private enum class Role { TEXT, SUB, DIM }
+    private enum class Role { TEXT, SUB, DIM, RED, BLUE }
 
-    // 레이아웃(다크/라이트)에 적힌 색 → 역할. 여기 없는 색(빨강 일요일, 파랑 다운로드 등)은 의미가 있어서 그대로 둔다
+    // 레이아웃(다크/라이트)에 적힌 색 → 역할. 빨강·파랑(일요일·다운로드 등)은 팩의 red/blue 톤으로
     private val ROLE_OF = mapOf(
         0xFFFFFFFF.toInt() to Role.TEXT, 0xFF1C1C1E.toInt() to Role.TEXT,
         0x99FFFFFF.toInt() to Role.SUB, 0xFF8E8E93.toInt() to Role.SUB,
         0xCCFFFFFF.toInt() to Role.SUB, 0xCC1C1C1E.toInt() to Role.SUB,
         0x66FFFFFF to Role.DIM, 0xFFAEAEB2.toInt() to Role.DIM,
+        0xFFFF453A.toInt() to Role.RED, 0xFFFF375F.toInt() to Role.RED,
+        0xFF0A84FF.toInt() to Role.BLUE,
     )
 
     private val roleCache = HashMap<Int, List<Pair<Int, Role>>>()
 
     /**
      * views의 레이아웃 XML을 읽어 역할 색을 쓰는 TextView(id 있는 것)에 팩 글자색을 입힌다.
-     * 맥 다크/라이트는 레이아웃 색이 곧 팩 색이라 건너뛴다. 코드에서 따로 setTextColor 한 뷰는 강조색 등 역할 밖 색이라 겹치지 않는다.
+     * 맥 다크/라이트는 레이아웃 색이 곧 팩 색이라 건너뛴다.
+     * 코드에서 따로 색을 정하는 뷰(미리 알림 개수처럼 강조색)는 dress 뒤에 칠해야 덮이지 않는다.
      */
     fun tintText(context: Context, views: RemoteViews, pack: SkinPack = current(context)) {
         if (pack.id == MAC_DARK.id || pack.id == MAC_LIGHT.id) return
         val p = pack.palette
         for ((id, role) in roles(context, views.layoutId)) {
-            views.setTextColor(id, when (role) { Role.TEXT -> p.text; Role.SUB -> p.subText; Role.DIM -> p.dim })
+            views.setTextColor(id, when (role) {
+                Role.TEXT -> p.text; Role.SUB -> p.subText; Role.DIM -> p.dim
+                Role.RED -> pack.red; Role.BLUE -> pack.blue
+            })
         }
     }
 

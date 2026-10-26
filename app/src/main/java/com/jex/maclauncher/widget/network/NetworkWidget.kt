@@ -33,8 +33,6 @@ class NetworkWidget : AppWidgetProvider() {
     }
 
     companion object {
-        private const val DOWN = 0xFF0A84FF.toInt()
-        private const val UP = 0xFFFF375F.toInt()
         /** 그래프 꽉 찬 높이의 최소 기준 (거의 안 쓸 때 잡음이 크게 보이지 않게) */
         private const val MIN_SCALE = 64_000L
 
@@ -55,7 +53,8 @@ class NetworkWidget : AppWidgetProvider() {
             val small = size.narrowerThan(250)
             val views = RemoteViews(context.packageName, WidgetTheme.layout(context, if (small) R.layout.widget_network_small else R.layout.widget_network))
             val live = NetworkStats.live
-            val p = WidgetTheme.palette(context)
+            val pack = Skin.current(context)
+            val p = pack.palette
 
             views.setTextViewText(R.id.net_type, NetworkStats.connection(context))
             views.setTextViewText(R.id.net_down, NetworkStats.speed(live.down))
@@ -63,8 +62,8 @@ class NetworkWidget : AppWidgetProvider() {
 
             // 두 그래프를 같은 눈금으로
             val scale = maxOf(MIN_SCALE, live.downHistory.maxOrNull() ?: 0, live.upHistory.maxOrNull() ?: 0).toFloat()
-            views.setImageViewBitmap(R.id.net_graph_down, MonitorGraphics.graph(live.downHistory.map { it / scale }, NetworkStats.HISTORY, DOWN, p.grid))
-            views.setImageViewBitmap(R.id.net_graph_up, MonitorGraphics.graph(live.upHistory.map { it / scale }, NetworkStats.HISTORY, UP, 0))
+            views.setImageViewBitmap(R.id.net_graph_down, MonitorGraphics.graph(live.downHistory.map { it / scale }, NetworkStats.HISTORY, pack.blue, p.grid))
+            views.setImageViewBitmap(R.id.net_graph_up, MonitorGraphics.graph(live.upHistory.map { it / scale }, NetworkStats.HISTORY, pack.red, 0))
 
             views.setTextViewText(
                 R.id.net_today,

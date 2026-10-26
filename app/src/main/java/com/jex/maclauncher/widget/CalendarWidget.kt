@@ -73,8 +73,6 @@ class CalendarWidget : AppWidgetProvider() {
         private const val KEY_OFFSET = "offset_"
 
         private const val EVENT = 0xFF8E8E93.toInt()
-        private const val RED = 0xFFFF453A.toInt()
-        private const val BLUE = 0xFF0A84FF.toInt()
 
         private val ROWS = intArrayOf(R.id.row0, R.id.row1, R.id.row2, R.id.row3, R.id.row4, R.id.row5)
         private val DAYS = intArrayOf(
@@ -129,8 +127,8 @@ class CalendarWidget : AppWidgetProvider() {
                 val color = when {
                     isToday -> onToday   // 강조색 박스 위
                     !inMonth -> p.dim
-                    i % 7 == 0 -> RED
-                    i % 7 == 6 -> BLUE
+                    i % 7 == 0 -> pack.red
+                    i % 7 == 6 -> pack.blue
                     else -> p.text
                 }
                 // 일정 있는 날은 숫자 아래 작은 점 (모든 칸이 두 줄이라 숫자 위치가 같음)

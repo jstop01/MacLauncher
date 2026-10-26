@@ -74,13 +74,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingBottom="4dp">
-            <TextView style="@style/CalCell.Light" android:text="일" android:textColor="#FF453A" android:textStyle="bold" />
+            <TextView android:id="@+id/skin_t7" style="@style/CalCell.Light" android:text="일" android:textColor="#FF453A" android:textStyle="bold" />
             <TextView android:id="@+id/skin_t2" style="@style/CalCell.Light" android:text="월" android:textColor="#1C1C1E" android:textStyle="bold" />
             <TextView android:id="@+id/skin_t3" style="@style/CalCell.Light" android:text="화" android:textColor="#1C1C1E" android:textStyle="bold" />
             <TextView android:id="@+id/skin_t4" style="@style/CalCell.Light" android:text="수" android:textColor="#1C1C1E" android:textStyle="bold" />
             <TextView android:id="@+id/skin_t5" style="@style/CalCell.Light" android:text="목" android:textColor="#1C1C1E" android:textStyle="bold" />
             <TextView android:id="@+id/skin_t6" style="@style/CalCell.Light" android:text="금" android:textColor="#1C1C1E" android:textStyle="bold" />
-            <TextView style="@style/CalCell.Light" android:text="토" android:textColor="#0A84FF" android:textStyle="bold" />
+            <TextView android:id="@+id/skin_t8" style="@style/CalCell.Light" android:text="토" android:textColor="#0A84FF" android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout

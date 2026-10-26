@@ -31,6 +31,14 @@ class SkinContrastTest {
     }
 
     @Test
+    fun weekendAndTrafficColorsAreVisible() = forEachPanel { pack, bg ->
+        // 일요일 빨강·토요일 파랑 숫자, 네트워크 ↓↑ 화살표
+        val r = contrast(pack.red, bg)
+        val b = contrast(pack.blue, bg)
+        assertTrue("${pack.id} 빨강 대비 ${"%.2f".format(r)} / 파랑 ${"%.2f".format(b)} < 2.5", r >= 2.5 && b >= 2.5)
+    }
+
+    @Test
     fun textOnAccentIsReadable() = Skin.BUILTIN.forEach { pack ->
         // 오늘 날짜 숫자는 굵은 글씨라 큰 글씨 기준(3:1). 맥 파랑 위 흰 글씨(3.65)가 기준점
         val ratio = contrast(Skin.onAccent(pack), pack.accent)

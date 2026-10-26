@@ -34,7 +34,13 @@ class RemindersWidget : AppWidgetProvider() {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, RemindersWidget::class.java))
             ids.forEach { id ->
-                manager.updateAppWidget(id, Skin.dress(context, views(context, id), WidgetSize.of(manager, id)))
+                val views = Skin.dress(context, views(context, id), WidgetSize.of(manager, id))
+                // 강조색은 dress(레이아웃 파랑 → 팩 blue) 뒤에 칠해야 남는다
+                val accent = Skin.current(context).accent
+                views.setTextColor(R.id.rem_count, accent)
+                views.setTextColor(R.id.rem_add, accent)
+                views.setTextColor(R.id.rem_clear, (accent and 0x00FFFFFF) or (0x99 shl 24))
+                manager.updateAppWidget(id, views)
                 manager.notifyAppWidgetViewDataChanged(id, R.id.rem_list)
             }
         }
@@ -42,11 +48,6 @@ class RemindersWidget : AppWidgetProvider() {
         private fun views(context: Context, id: Int): RemoteViews =
             RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_reminders)).apply {
                 setTextViewText(R.id.rem_count, ReminderStore.remaining(context).toString())
-                val accent = Skin.current(context).accent
-                setTextColor(R.id.rem_count, accent)
-                setTextColor(R.id.rem_add, accent)
-                setTextColor(R.id.rem_clear, (accent and 0x00FFFFFF) or (0x99 shl 24))
-
                 val done = ReminderStore.completed(context)
                 setViewVisibility(R.id.rem_clear, if (done > 0) View.VISIBLE else View.GONE)
                 setTextViewText(R.id.rem_clear, "완료된 항목 ${done}개 지우기")

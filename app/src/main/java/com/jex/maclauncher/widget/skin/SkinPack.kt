@@ -18,6 +18,9 @@ data class SkinPack(
     val panel: PanelStyle,              // 패널 배경을 어떻게 그릴지
     val icon: IconStyle,                // 코드로 그리는 아이콘 스타일
     val cornerRadiusDp: Float = 20f,
+    // 의미 있는 빨강·파랑(일요일·토요일, 업로드·다운로드). 색 있는 배경에선 묻히지 않게 팩마다 톤을 바꾼다
+    val red: Int = 0xFFFF453A.toInt(),
+    val blue: Int = 0xFF0A84FF.toInt(),
 )
 
 enum class Tier { FREE, PREMIUM }
