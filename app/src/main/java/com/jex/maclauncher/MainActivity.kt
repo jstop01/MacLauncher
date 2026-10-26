@@ -490,6 +490,8 @@ private fun SkinPicker() {
     val currentId = remember(version) { Skin.current(context).id }
     val unlocked = remember(version) { Entitlements.unlockedIds(context) }
     var purchasing by remember { mutableStateOf<SkinPack?>(null) }
+    // 다른 기기에서 산 팩·환불된 팩을 Play 구매 내역으로 맞춘다
+    LaunchedEffect(Unit) { SkinBilling.restore(context) { version++ } }
 
     fun apply(pack: SkinPack) {
         // 아직 이관 안 된 위젯(배터리·달력 등)이 밝기라도 맞게 isLight 동기화
@@ -520,7 +522,8 @@ private fun SkinPicker() {
             pack = pack,
             onDismiss = { purchasing = null },
             onPurchase = {
-                SkinBilling.purchase(context, pack) { result ->
+                val activity = context as? android.app.Activity ?: return@PremiumDialog
+                SkinBilling.purchase(activity, pack) { result ->
                     when (result) {
                         is SkinBilling.Result.Purchased -> { version++; apply(pack); purchasing = null }
                         is SkinBilling.Result.Canceled -> purchasing = null
@@ -546,6 +549,9 @@ private fun PremiumDialog(
     onDebugUnlock: () -> Unit,
     debug: Boolean,
 ) {
+    val context = LocalContext.current
+    var price by remember(pack.id) { mutableStateOf<String?>(null) }
+    LaunchedEffect(pack.id) { SkinBilling.price(context, pack) { price = it } }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("‘${pack.name}’ 프리미엄 감성") },
@@ -562,7 +568,7 @@ private fun PremiumDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onPurchase) { Text("구매") } },
+        confirmButton = { TextButton(onClick = onPurchase) { Text(price?.let { "구매 · $it" } ?: "구매") } },
         dismissButton = {
             if (debug) TextButton(onClick = onDebugUnlock) { Text("바로 해금") }
             else TextButton(onClick = onDismiss) { Text("닫기") }

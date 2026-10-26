@@ -61,5 +61,8 @@ dependencies {
     implementation(libs.androidx.material3)
     // 배터리 위젯: 블루투스 기기 배터리(BluetoothDevice.getBatteryLevel, 숨은 API) 읽기
     implementation(libs.hiddenapibypass)
+    // 프리미엄 감성 팩 인앱 결제
+    implementation(libs.billing.ktx)
+    implementation(libs.androidx.fragment)  // billing이 끌어오는 옛 fragment를 올림 (ActivityResult lint)
     debugImplementation(libs.androidx.ui.tooling)
 }
