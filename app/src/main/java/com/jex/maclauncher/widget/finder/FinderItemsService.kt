@@ -128,7 +128,8 @@ class FinderItemsService : RemoteViewsService() {
 
         // 기본 "Loading..." 글자 대신 빈 칸
         override fun getLoadingView(): RemoteViews = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
-        override fun getViewTypeCount() = 1
+        // 다크·라이트 항목 레이아웃 두 가지. 1이면 밝은↔어두운 팩 전환 뒤 항목이 '불러오는 중'에서 멈춘다
+        override fun getViewTypeCount() = 2
         override fun getItemId(position: Int) = position.toLong()
         override fun hasStableIds() = false
     }
