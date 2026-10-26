@@ -12,8 +12,8 @@ android {
         applicationId = "com.jex.maclauncher"
         minSdk = 29
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "1.2.0"
     }
 
     // 배포 서명: 키와 비밀번호는 ~/.gradle/gradle.properties 에만 (저장소에 넣지 않음)
