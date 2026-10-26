@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.skin
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.XmlResourceParser
 import android.view.View
 import android.widget.RemoteViews
@@ -176,6 +177,10 @@ object Skin {
 
     fun byId(id: String): SkinPack? = BUILTIN.firstOrNull { it.id == id }
 
+    /** 폰이 지금 다크 모드인지 (앱 프로세스 설정 = 시스템 설정) */
+    fun systemNight(context: Context): Boolean =
+        (context.applicationContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
     /** 강조색 위에 올릴 글자색: 밝은 강조색(선셋 노랑 등)이면 검정, 아니면 흰색 */
     fun onAccent(pack: SkinPack): Int {
         val c = pack.accent
@@ -191,7 +196,7 @@ object Skin {
     fun current(context: Context): SkinPack {
         val themeDefault = if (WidgetTheme.isLight(context)) MAC_LIGHT else MAC_DARK
         val id = SkinPrefs.selectedId(context)
-        if (id == SkinPrefs.AUTO) return themeDefault
+        if (id == SkinPrefs.AUTO || id == SkinPrefs.SYSTEM) return themeDefault
         val pack = byId(id) ?: return themeDefault
         return if (Entitlements.isUnlocked(context, pack)) pack else themeDefault
     }

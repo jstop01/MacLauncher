@@ -2,6 +2,8 @@ package com.jex.maclauncher.widget
 
 import android.content.Context
 import com.jex.maclauncher.R
+import com.jex.maclauncher.widget.skin.Skin
+import com.jex.maclauncher.widget.skin.SkinPrefs
 
 /**
  * 위젯 라이트/다크 테마. 앱에서 바꾸면 이미 놓인 위젯을 모두 다시 그린다.
@@ -62,7 +64,8 @@ object WidgetTheme {
     )
 
     fun isLight(context: Context): Boolean =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_LIGHT, false)
+        if (SkinPrefs.selectedId(context) == SkinPrefs.SYSTEM) !Skin.systemNight(context)
+        else context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_LIGHT, false)
 
     /** 저장만 (다시 그리기는 호출한 쪽에서, 백업 복원용) */
     fun setLightQuietly(context: Context, light: Boolean) {

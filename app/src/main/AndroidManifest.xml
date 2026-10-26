@@ -63,6 +63,7 @@
     </queries>
 
     <application
+        android:name=".MacWidgetsApp"
         android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"

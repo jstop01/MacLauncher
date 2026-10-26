@@ -17,6 +17,9 @@ object SkinPrefs {
     /** "테마 따름" 센티넬: 저장된 팩 id가 이 값이면 라이트/다크 토글을 따른다. */
     const val AUTO = "auto"
 
+    /** 폰 다크 모드를 따라 맥 다크/맥 라이트로 자동 전환 */
+    const val SYSTEM = "system"
+
     fun selectedId(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_PACK, AUTO) ?: AUTO
 

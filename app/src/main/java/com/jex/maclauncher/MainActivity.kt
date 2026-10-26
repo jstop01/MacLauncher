@@ -494,6 +494,7 @@ private fun SkinPicker() {
     val context = LocalContext.current
     var version by remember { mutableStateOf(0) }
     val currentId = remember(version) { Skin.current(context).id }
+    val followSystem = remember(version) { SkinPrefs.selectedId(context) == SkinPrefs.SYSTEM }
     val unlocked = remember(version) { Entitlements.unlockedIds(context) }
     var purchasing by remember { mutableStateOf<SkinPack?>(null) }
     // 다른 기기에서 산 팩·환불된 팩을 Play 구매 내역으로 맞춘다
@@ -510,15 +511,19 @@ private fun SkinPicker() {
         Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(18.dp),
     ) {
         Text("위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-        Text("홈 화면 위젯의 감성을 골라요. 바꾸면 바로 적용돼요. (배경·그래프·강조색이 함께 바뀌어요)", color = Sub, fontSize = 13.sp)
+        Text("홈 화면 위젯의 감성을 골라요. 바꾸면 바로 적용돼요. (배경·그래프·강조색이 함께 바뀌어요) ‘자동’은 폰 다크 모드를 따라가요.", color = Sub, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
         SkinPreview(Skin.byId(currentId) ?: Skin.MAC_DARK)
         Spacer(Modifier.height(14.dp))
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
-            Skin.BUILTIN.forEachIndexed { i, pack ->
-                if (i > 0) Spacer(Modifier.width(14.dp))
+            SystemSwatch(selected = followSystem) {
+                SkinPrefs.select(context, SkinPrefs.SYSTEM)
+                version++
+            }
+            Skin.BUILTIN.forEach { pack ->
+                Spacer(Modifier.width(14.dp))
                 val locked = pack.tier == Tier.PREMIUM && pack.id !in unlocked
-                SkinSwatch(pack, selected = pack.id == currentId, locked = locked) {
+                SkinSwatch(pack, selected = !followSystem && pack.id == currentId, locked = locked) {
                     if (locked) purchasing = pack else apply(pack)
                 }
             }
@@ -580,6 +585,38 @@ private fun PremiumDialog(
             else TextButton(onClick = onDismiss) { Text("닫기") }
         },
     )
+}
+
+/** '시스템 따라가기' 스와치: 왼쪽 위 라이트, 오른쪽 아래 다크로 나눈 칸 */
+@Composable
+private fun SystemSwatch(selected: Boolean, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable(onClick = onClick)) {
+        Box(
+            Modifier
+                .size(58.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color(Skin.MAC_LIGHT.palette.panel))
+                .border(
+                    if (selected) 2.5.dp else 1.dp,
+                    if (selected) Color(0xFF0A84FF) else Color(0x33FFFFFF),
+                    RoundedCornerShape(14.dp),
+                ),
+        ) {
+            Canvas(Modifier.fillMaxSize()) {
+                val tri = Path().apply {
+                    moveTo(size.width, 0f); lineTo(size.width, size.height); lineTo(0f, size.height); close()
+                }
+                drawPath(tri, Color(Skin.MAC_DARK.palette.panel))
+            }
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "자동",
+            color = if (selected) Color.White else Sub,
+            fontSize = 12.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        )
+    }
 }
 
 /** 감성 스와치 한 칸: 팩 배경색 미리보기 + 이름 (+ 프리미엄 자물쇠). */
