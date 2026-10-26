@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <TextView android:id="@+id/skin_t1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

@@ -36,7 +36,7 @@
                 android:layout_height="28dp"
                 android:src="@drawable/ic_reminders" />
 
-            <TextView
+            <TextView android:id="@+id/skin_t1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"

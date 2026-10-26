@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.skin
 
 import android.content.Context
+import android.content.res.XmlResourceParser
 import android.view.View
 import android.widget.RemoteViews
 import com.jex.maclauncher.R
@@ -159,7 +160,7 @@ object Skin {
     /**
      * 레이아웃의 skin_bg에 지금 팩의 패널을 깔고 그 views를 그대로 돌려준다 (날씨·시계 외 위젯 공용).
      * 맥 다크/라이트는 비트맵 없이 기존 드로어블. panel=false면 배경 없이(Finder 최소화).
-     * 글자색은 아직 레이아웃(다크/라이트 한 벌)을 따른다: 팩의 isLight로 WidgetTheme가 맞춰져 있음.
+     * 레이아웃에 박힌 글자색도 [tintText]로 팩 팔레트로 바꿔 끼운다.
      */
     fun dress(
         context: Context, views: RemoteViews, size: WidgetSize, panel: Boolean = true,
@@ -173,8 +174,52 @@ object Skin {
             pack.id == MAC_LIGHT.id -> views.setImageViewResource(R.id.skin_bg, macLight)
             else -> applyPanel(context, views, R.id.skin_bg, pack, size)
         }
+        tintText(context, views, pack)
         return views
     }
+
+    private enum class Role { TEXT, SUB, DIM }
+
+    // 레이아웃(다크/라이트)에 적힌 색 → 역할. 여기 없는 색(빨강 일요일, 파랑 다운로드 등)은 의미가 있어서 그대로 둔다
+    private val ROLE_OF = mapOf(
+        0xFFFFFFFF.toInt() to Role.TEXT, 0xFF1C1C1E.toInt() to Role.TEXT,
+        0x99FFFFFF.toInt() to Role.SUB, 0xFF8E8E93.toInt() to Role.SUB,
+        0xCCFFFFFF.toInt() to Role.SUB, 0xCC1C1C1E.toInt() to Role.SUB,
+        0x66FFFFFF to Role.DIM, 0xFFAEAEB2.toInt() to Role.DIM,
+    )
+
+    private val roleCache = HashMap<Int, List<Pair<Int, Role>>>()
+
+    /**
+     * views의 레이아웃 XML을 읽어 역할 색을 쓰는 TextView(id 있는 것)에 팩 글자색을 입힌다.
+     * 맥 다크/라이트는 레이아웃 색이 곧 팩 색이라 건너뛴다. 코드에서 따로 setTextColor 한 뷰는 강조색 등 역할 밖 색이라 겹치지 않는다.
+     */
+    fun tintText(context: Context, views: RemoteViews, pack: SkinPack = current(context)) {
+        if (pack.id == MAC_DARK.id || pack.id == MAC_LIGHT.id) return
+        val p = pack.palette
+        for ((id, role) in roles(context, views.layoutId)) {
+            views.setTextColor(id, when (role) { Role.TEXT -> p.text; Role.SUB -> p.subText; Role.DIM -> p.dim })
+        }
+    }
+
+    private fun roles(context: Context, layout: Int): List<Pair<Int, Role>> = synchronized(roleCache) {
+        roleCache.getOrPut(layout) {
+            val out = ArrayList<Pair<Int, Role>>()
+            runCatching {
+                context.resources.getLayout(layout).use { x ->
+                    while (x.next() != XmlResourceParser.END_DOCUMENT) {
+                        if (x.eventType != XmlResourceParser.START_TAG || x.getAttributeValue(ANDROID, "textColor") == null) continue
+                        val id = x.getAttributeResourceValue(ANDROID, "id", 0)
+                        val role = ROLE_OF[x.getAttributeIntValue(ANDROID, "textColor", 0)]
+                        if (id != 0 && role != null) out += id to role
+                    }
+                }
+            }
+            out
+        }
+    }
+
+    private const val ANDROID = "http://schemas.android.com/apk/res/android"
 
     /** 레이아웃 맨 밑 skin_bg(ImageView)에 팩 배경 비트맵을 깐다. */
     fun applyPanel(context: Context, views: RemoteViews, bgId: Int, pack: SkinPack, size: WidgetSize) {

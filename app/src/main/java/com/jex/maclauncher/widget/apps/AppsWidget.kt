@@ -127,6 +127,7 @@ class AppsItemsService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews {
             val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
+            Skin.tintText(context, views)
             val app = apps.getOrNull(position) ?: return views
             views.setTextViewText(R.id.item_name, app.label)
             MacIcon.of(context, app.packageName, 112)?.let { views.setImageViewBitmap(R.id.item_icon, it) }

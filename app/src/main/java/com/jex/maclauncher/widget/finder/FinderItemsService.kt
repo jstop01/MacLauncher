@@ -11,6 +11,7 @@ import android.widget.RemoteViewsService
 import com.jex.maclauncher.widget.MacIcon
 import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.WidgetTheme
+import com.jex.maclauncher.widget.skin.Skin
 import com.jex.maclauncher.widget.apps.AppCatalog
 
 /** Finder 격자 한 칸 */
@@ -71,6 +72,7 @@ class FinderItemsService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews {
             val views = RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_finder_item))
+            Skin.tintText(context, views)
             when (val e = entries.getOrNull(position)) {
                 is Entry.FileEntry -> {
                     views.setTextViewText(R.id.item_name, e.item.file.name)
