@@ -48,6 +48,14 @@ object WidgetTheme {
             R.layout.widget_reminders_item to R.layout.widget_reminders_item_light,
             R.layout.widget_reminders to R.layout.widget_reminders_light,
             R.layout.widget_storage to R.layout.widget_storage_light,
+            R.layout.widget_music to R.layout.widget_music_light,
+            R.layout.widget_music_small to R.layout.widget_music_small_light,
+            R.layout.widget_network to R.layout.widget_network_light,
+            R.layout.widget_network_small to R.layout.widget_network_small_light,
+            R.layout.widget_screentime to R.layout.widget_screentime_light,
+            R.layout.widget_screentime_small to R.layout.widget_screentime_small_light,
+            R.layout.widget_shortcuts to R.layout.widget_shortcuts_light,
+            R.layout.widget_timer to R.layout.widget_timer_light,
             // 날씨 위젯은 Skin 팩(런타임 색/배경)으로 전환되어 _light 레이아웃을 쓰지 않는다.
     )
 
