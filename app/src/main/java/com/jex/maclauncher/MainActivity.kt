@@ -1,5 +1,11 @@
 package com.jex.maclauncher
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.Path
 import android.Manifest
 import android.app.ActivityOptions
 import android.app.PendingIntent
@@ -506,6 +512,8 @@ private fun SkinPicker() {
         Text("위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
         Text("홈 화면 위젯의 감성을 골라요. 바꾸면 바로 적용돼요. (배경·그래프·강조색이 함께 바뀌어요)", color = Sub, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
+        SkinPreview(Skin.byId(currentId) ?: Skin.MAC_DARK)
+        Spacer(Modifier.height(14.dp))
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             Skin.BUILTIN.forEachIndexed { i, pack ->
                 if (i > 0) Spacer(Modifier.width(14.dp))
@@ -557,14 +565,12 @@ private fun PremiumDialog(
         title = { Text("‘${pack.name}’ 프리미엄 감성") },
         text = {
             Column {
-                Box(
-                    Modifier.fillMaxWidth().height(90.dp).clip(RoundedCornerShape(14.dp)).background(pack.previewBrush()),
-                )
+                SkinPreview(pack)
                 Spacer(Modifier.height(12.dp))
                 Text("구매하면 로그인한 Google 계정의 모든 기기에서 쓸 수 있어요.", fontSize = 14.sp)
                 if (debug) {
                     Spacer(Modifier.height(8.dp))
-                    Text("(디버그 빌드: 결제 없이 ‘바로 해금’으로 테스트할 수 있어요)", color = Sub, fontSize = 12.sp)
+                    Text("(디버그 빌드: 결제 없이 ‘바로 해금’으로 테스트할 수 있어요)", color = Color.Gray, fontSize = 12.sp)
                 }
             }
         },
@@ -605,6 +611,73 @@ private fun SkinSwatch(pack: SkinPack, selected: Boolean, locked: Boolean, onCli
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
         )
     }
+}
+
+/**
+ * 팩을 입힌 미니 위젯 미리보기: CPU 링·그래프(강조색), 제목·보조 글씨, 오늘 표시.
+ * 실제 위젯과 같은 팔레트 값을 써서 사기 전에 느낌을 볼 수 있게 한다.
+ */
+@Composable
+private fun SkinPreview(pack: SkinPack) {
+    val p = pack.palette
+    val text = Color(p.text)
+    val sub = Color(p.subText)
+    val accent = Color(pack.accent)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(112.dp)
+            .clip(RoundedCornerShape(pack.cornerRadiusDp.dp))
+            .background(pack.previewBrush())
+            .border(1.dp, Color(pack.strokeColor()), RoundedCornerShape(pack.cornerRadiusDp.dp))
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+            Canvas(Modifier.fillMaxSize()) {
+                val w = size.minDimension * 0.12f
+                val inset = w / 2
+                val arcSize = androidx.compose.ui.geometry.Size(size.width - w, size.height - w)
+                val tl = androidx.compose.ui.geometry.Offset(inset, inset)
+                drawArc(Color(p.track), 0f, 360f, false, tl, arcSize, style = Stroke(w))
+                drawArc(accent, -90f, 360f * 0.42f, false, tl, arcSize, style = Stroke(w, cap = StrokeCap.Round))
+            }
+            Text("42%", color = text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        }
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text("시스템 모니터", color = text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text("메모리 6.2GB · 일정 2개", color = sub, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(6.dp))
+            Canvas(Modifier.fillMaxWidth().height(24.dp)) {
+                val ys = listOf(0.7f, 0.55f, 0.8f, 0.35f, 0.6f, 0.2f, 0.5f, 0.3f, 0.65f, 0.45f)
+                val path = Path()
+                ys.forEachIndexed { i, y ->
+                    val x = size.width * i / (ys.size - 1)
+                    if (i == 0) path.moveTo(x, size.height * y) else path.lineTo(x, size.height * y)
+                }
+                drawLine(Color(p.grid), androidx.compose.ui.geometry.Offset(0f, size.height), androidx.compose.ui.geometry.Offset(size.width, size.height))
+                drawPath(path, accent, style = Stroke(2.dp.toPx(), cap = StrokeCap.Round))
+            }
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("10월", color = sub, fontSize = 11.sp)
+            Box(
+                Modifier.padding(top = 2.dp).size(30.dp).background(accent, RoundedCornerShape(9.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("26", color = Color(Skin.onAccent(pack)), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+/** 위젯 패널 테두리 색 (맥 다크처럼 앱 배경과 비슷한 팩도 미리보기 경계가 보이게) */
+private fun SkinPack.strokeColor(): Int = when (val s = panel) {
+    is PanelStyle.Solid -> s.stroke
+    is PanelStyle.Gradient -> s.stroke
+    is PanelStyle.Glass -> s.stroke
 }
 
 /** 팩 배경을 스와치용 Compose Brush로. 위젯에 실제로 깔리는 SkinGraphics와 같은 색을 쓴다. */
