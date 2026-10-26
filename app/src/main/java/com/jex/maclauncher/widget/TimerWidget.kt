@@ -11,6 +11,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
@@ -29,6 +30,9 @@ import com.jex.maclauncher.R
 class TimerWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) = updateAll(context)
+
+    // 크기 변경(패널 비트맵 크기), One UI 다크 모드 전환 때도 옵션이 바뀌어 다시 그린다
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, newOptions: Bundle) = updateAll(context)
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
