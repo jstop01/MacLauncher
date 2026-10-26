@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- macOS 타이머: 주황 링 + 남은 시간(Chronometer가 스스로 줄어듦) + 시작/일시정지/취소 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 감성 팩 패널 배경 (Skin.dress가 비트맵으로 교체). src는 미리보기용 기본값 -->
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg" />
+
+    <LinearLayout
     android:id="@+id/tm_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
     android:orientation="vertical"
     android:padding="12dp">
 
@@ -71,3 +83,4 @@
         <ImageView android:id="@+id/tm_toggle" style="@style/TmButton" android:src="@drawable/ic_media_pause" android:contentDescription="일시정지/이어하기" />
     </LinearLayout>
 </LinearLayout>
+</FrameLayout>

@@ -1,7 +1,9 @@
 package com.jex.maclauncher.widget.skin
 
 import android.content.Context
+import android.view.View
 import android.widget.RemoteViews
+import com.jex.maclauncher.R
 import com.jex.maclauncher.widget.WidgetSize
 import com.jex.maclauncher.widget.WidgetTheme
 import kotlin.math.roundToInt
@@ -40,13 +42,24 @@ object Skin {
 
     // ── 여기부터는 "새 감성 = 데이터 하나"의 증명. 레이아웃·코드 추가 없이 아래 객체만으로 다른 감성이 뜬다. ──
 
+    // 색 있는 배경 위에서는 회색 트랙·패널색이 탁해 보여서, 반투명 흰색/검정으로 배경색이 비치게 한다
+    private fun onColor(panel: Int) = WidgetTheme.Palette(
+        text = 0xFFFFFFFF.toInt(), subText = 0xD9FFFFFF.toInt(), dim = 0x80FFFFFF.toInt(),
+        track = 0x40FFFFFF, grid = 0x33FFFFFF, panel = panel,
+    )
+
+    private fun onPastel(panel: Int) = WidgetTheme.Palette(
+        text = 0xFF1C1C1E.toInt(), subText = 0xB31C1C1E.toInt(), dim = 0x661C1C1E,
+        track = 0x26000000, grid = 0x1F000000, panel = panel,
+    )
+
     /** 선셋: 주황→마젠타 그라데이션. 채도 높아 흰 글씨가 잘 읽힌다. */
     val SUNSET = SkinPack(
         id = "sunset",
         name = "선셋",
         tier = Tier.FREE,
         isLight = false,
-        palette = WidgetTheme.DARK,
+        palette = onColor(0xFFEE3A52.toInt()),
         accent = 0xFFFFD166.toInt(),
         panel = PanelStyle.Gradient(from = 0xFFFF512F.toInt(), to = 0xFFDD2476.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
         icon = IconStyle(),
@@ -59,7 +72,7 @@ object Skin {
         name = "오션 글래스",
         tier = Tier.PREMIUM,
         isLight = false,
-        palette = WidgetTheme.DARK,
+        palette = onColor(0xFF0A4A6B.toInt()),
         accent = 0xFF4AD7D1.toInt(),
         panel = PanelStyle.Glass(tint = 0xFF0A4A6B.toInt(), alpha = 0xD9, stroke = 0x40FFFFFF),
         icon = IconStyle(),
@@ -72,17 +85,63 @@ object Skin {
         name = "버블껌",
         tier = Tier.PREMIUM,
         isLight = true,
-        palette = WidgetTheme.LIGHT,
+        palette = onPastel(0xFFDAEFF2.toInt()),
         accent = 0xFFFF4D8D.toInt(),
         panel = PanelStyle.Gradient(from = 0xFFFFDEE9.toInt(), to = 0xFFB5FFFC.toInt(), angleDeg = 90f, stroke = 0x1A000000),
         icon = IconStyle(),
         cornerRadiusDp = 24f,
     )
 
-    /** 내장 팩 (무료). 추후 프리미엄 팩은 IAP 해금 후 여기에 합쳐 노출. */
-    val BUILTIN = listOf(MAC_DARK, MAC_LIGHT, SUNSET, OCEAN_GLASS, BUBBLEGUM)
+    /** 미드나잇: 짙은 남색 단색 + 푸른 테두리. 맥 다크보다 차분한 밤 느낌. */
+    val MIDNIGHT = SkinPack(
+        id = "midnight",
+        name = "미드나잇",
+        tier = Tier.FREE,
+        isLight = false,
+        palette = WidgetTheme.DARK.copy(subText = 0xA6C8D2FF.toInt(), track = 0xFF232A4D.toInt(), panel = 0xFF0B1026.toInt()),
+        accent = 0xFF5E8BFF.toInt(),
+        panel = PanelStyle.Solid(color = 0xEB0B1026.toInt(), stroke = 0x404F6BFF),
+        icon = IconStyle(),
+        cornerRadiusDp = 20f,
+    )
+
+    /** 포레스트: 깊은 청록→연두 그라데이션. (프리미엄) */
+    val FOREST = SkinPack(
+        id = "forest",
+        name = "포레스트",
+        tier = Tier.PREMIUM,
+        isLight = false,
+        palette = onColor(0xFF3F8070.toInt()),
+        accent = 0xFFFFE08A.toInt(),
+        panel = PanelStyle.Gradient(from = 0xFF134E5E.toInt(), to = 0xFF71B280.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
+        icon = IconStyle(),
+        cornerRadiusDp = 24f,
+    )
+
+    /** 라벤더: 연보라→하늘 파스텔. 밝은 배경이라 어두운 글씨. (프리미엄) */
+    val LAVENDER = SkinPack(
+        id = "lavender",
+        name = "라벤더",
+        tier = Tier.PREMIUM,
+        isLight = true,
+        palette = onPastel(0xFFC9C6FB.toInt()),
+        accent = 0xFF6A3DF0.toInt(),
+        panel = PanelStyle.Gradient(from = 0xFFE0C3FC.toInt(), to = 0xFF8EC5FC.toInt(), angleDeg = 90f, stroke = 0x1A000000),
+        icon = IconStyle(),
+        cornerRadiusDp = 24f,
+    )
+
+    /** 피커에 보이는 순서: 무료 먼저, 프리미엄은 해금 전엔 자물쇠 */
+    val BUILTIN = listOf(MAC_DARK, MAC_LIGHT, SUNSET, MIDNIGHT, OCEAN_GLASS, BUBBLEGUM, FOREST, LAVENDER)
 
     fun byId(id: String): SkinPack? = BUILTIN.firstOrNull { it.id == id }
+
+    /** 강조색 위에 올릴 글자색: 밝은 강조색(선셋 노랑 등)이면 검정, 아니면 흰색 */
+    fun onAccent(pack: SkinPack): Int {
+        val c = pack.accent
+        val lum = 0.299 * ((c shr 16) and 0xFF) + 0.587 * ((c shr 8) and 0xFF) + 0.114 * (c and 0xFF)
+        return if (lum > 170) 0xFF1C1C1E.toInt() else 0xFFFFFFFF.toInt()
+    }
 
     /**
      * 지금 적용할 팩. 선택이 [SkinPrefs.AUTO]면 기존 라이트/다크 토글을 따르고,
@@ -95,6 +154,26 @@ object Skin {
         if (id == SkinPrefs.AUTO) return themeDefault
         val pack = byId(id) ?: return themeDefault
         return if (Entitlements.isUnlocked(context, pack)) pack else themeDefault
+    }
+
+    /**
+     * 레이아웃의 skin_bg에 지금 팩의 패널을 깔고 그 views를 그대로 돌려준다 (날씨·시계 외 위젯 공용).
+     * 맥 다크/라이트는 비트맵 없이 기존 드로어블. panel=false면 배경 없이(Finder 최소화).
+     * 글자색은 아직 레이아웃(다크/라이트 한 벌)을 따른다: 팩의 isLight로 WidgetTheme가 맞춰져 있음.
+     */
+    fun dress(
+        context: Context, views: RemoteViews, size: WidgetSize, panel: Boolean = true,
+        macDark: Int = R.drawable.widget_bg, macLight: Int = R.drawable.widget_bg_light,
+    ): RemoteViews {
+        val pack = current(context)
+        views.setViewVisibility(R.id.skin_bg, if (panel) View.VISIBLE else View.GONE)
+        when {
+            !panel -> Unit
+            pack.id == MAC_DARK.id -> views.setImageViewResource(R.id.skin_bg, macDark)
+            pack.id == MAC_LIGHT.id -> views.setImageViewResource(R.id.skin_bg, macLight)
+            else -> applyPanel(context, views, R.id.skin_bg, pack, size)
+        }
+        return views
     }
 
     /** 레이아웃 맨 밑 skin_bg(ImageView)에 팩 배경 비트맵을 깐다. */

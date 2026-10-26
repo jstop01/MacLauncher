@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.music
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -66,7 +67,7 @@ class MusicWidget : AppWidgetProvider() {
             val ids = manager.getAppWidgetIds(ComponentName(context, MusicWidget::class.java))
             if (ids.isEmpty()) return
             val controller = current(context)
-            ids.forEach { id -> manager.updateAppWidget(id, views(context, WidgetSize.of(manager, id), controller)) }
+            ids.forEach { id -> WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(context, views(context, size, controller), size)) } }
         }
 
         private fun views(context: Context, size: WidgetSize, c: MediaController?): RemoteViews {

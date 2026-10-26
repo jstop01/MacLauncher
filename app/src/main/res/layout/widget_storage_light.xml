@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 감성 팩 패널 배경 (Skin.dress가 비트맵으로 교체). src는 미리보기용 기본값 -->
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg_light" />
+
+    <LinearLayout
     android:id="@+id/st_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_bg_light"
     android:orientation="vertical"
     android:padding="14dp">
 
@@ -105,3 +117,4 @@
         android:textSize="12sp"
         android:visibility="gone" />
 </LinearLayout>
+</FrameLayout>

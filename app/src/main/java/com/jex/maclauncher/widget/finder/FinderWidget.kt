@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.finder
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -167,10 +168,6 @@ class FinderWidget : AppWidgetProvider() {
             // 아이콘 없이 접으면 아무 터치도 받지 않음: 겹쳐 놓은 아래 위젯(달력 등)을 가로채지 않게. 펼치기는 Dock의 Finder로
             // 펼쳐 있을 땐 내용이 꽉 차서 영향 없고, 최소화일 때 아이콘이 9칸 중 어디에 붙을지만 정함
             views.setInt(R.id.finder_root, "setGravity", miniGravity(miniPosition(context)))
-            views.setInt(
-                R.id.finder_root, "setBackgroundResource",
-                if (minimized) 0 else WidgetTheme.drawable(context, R.drawable.widget_bg),
-            )
 
             // 좁으면 사이드바를 숨기고 파일 격자만
             // 최대화(🟢)도 사이드바를 숨겨 격자를 창 전체로
@@ -213,7 +210,7 @@ class FinderWidget : AppWidgetProvider() {
                 views.setOnClickPendingIntent(R.id.finder_permission, FinderOpenActivity.permission(context, id))
                 views.setTextViewText(R.id.finder_footer, "")
             }
-            manager.updateAppWidget(id, views)
+            manager.updateAppWidget(id, Skin.dress(context, views, WidgetSize.of(manager, id), panel = !minimized))
             if (access) manager.notifyAppWidgetViewDataChanged(id, R.id.finder_grid)
         }
 

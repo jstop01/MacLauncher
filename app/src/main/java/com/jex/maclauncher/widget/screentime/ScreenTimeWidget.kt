@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.screentime
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.BroadcastReceiver
@@ -53,7 +54,7 @@ class ScreenTimeWidget : AppWidgetProvider() {
                     val ids = manager.getAppWidgetIds(ComponentName(app, ScreenTimeWidget::class.java))
                     if (ids.isEmpty()) return@thread
                     val today = if (RecentApps.hasAccess(app)) runCatching { ScreenTime.today(app) }.getOrNull() else null
-                    ids.forEach { id -> manager.updateAppWidget(id, views(app, WidgetSize.of(manager, id), today)) }
+                    ids.forEach { id -> WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(app, views(app, size, today), size)) } }
                 } finally {
                     pending?.finish()
                 }

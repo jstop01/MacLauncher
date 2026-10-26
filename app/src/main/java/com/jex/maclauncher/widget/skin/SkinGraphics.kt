@@ -16,8 +16,17 @@ import kotlin.math.sin
  */
 object SkinGraphics {
 
+    // 시스템 모니터처럼 1초마다 다시 그리는 위젯이 매번 비트맵을 새로 만들지 않게
+    private val cache = object : LinkedHashMap<String, Bitmap>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Bitmap>) = size > 12
+    }
+
     /** 위젯 픽셀 크기에 맞춘 패널 배경. cornerPx·strokePx는 이미 density 반영된 값. */
-    fun panel(pack: SkinPack, wPx: Int, hPx: Int, cornerPx: Float, strokePx: Float): Bitmap {
+    fun panel(pack: SkinPack, wPx: Int, hPx: Int, cornerPx: Float, strokePx: Float): Bitmap = synchronized(cache) {
+        cache.getOrPut("${pack.id}:$wPx:$hPx:$cornerPx:$strokePx") { draw(pack, wPx, hPx, cornerPx, strokePx) }
+    }
+
+    private fun draw(pack: SkinPack, wPx: Int, hPx: Int, cornerPx: Float, strokePx: Float): Bitmap {
         val w = wPx.coerceIn(8, 2000)
         val h = hPx.coerceIn(8, 2000)
         val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)

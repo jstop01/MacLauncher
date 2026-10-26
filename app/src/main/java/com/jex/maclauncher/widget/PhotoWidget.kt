@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget
 
 import android.Manifest
+import com.jex.maclauncher.widget.skin.Skin
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -62,7 +63,7 @@ class PhotoWidget : AppWidgetProvider() {
                 try {
                     val manager = AppWidgetManager.getInstance(app)
                     manager.getAppWidgetIds(ComponentName(app, PhotoWidget::class.java)).forEach { id ->
-                        runCatching { manager.updateAppWidget(id, views(app, manager, id, keepPhoto)) }
+                        runCatching { manager.updateAppWidget(id, Skin.dress(app, views(app, manager, id, keepPhoto), WidgetSize.of(manager, id))) }
                     }
                 } finally {
                     pending?.finish()
@@ -105,7 +106,6 @@ class PhotoWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.photo_hint, text)
             views.setViewVisibility(R.id.photo_scrim, View.GONE)
             views.setTextViewText(R.id.photo_date, "")
-            views.setInt(R.id.photo_root, "setBackgroundResource", WidgetTheme.drawable(context, R.drawable.widget_bg))
             views.setTextColor(R.id.photo_hint, WidgetTheme.palette(context).subText)
             click?.let { views.setOnClickPendingIntent(R.id.photo_root, it) }
             return views

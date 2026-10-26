@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 스크린 타임 작은 크기: 오늘 합계 + 많이 쓴 앱 3개 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 감성 팩 패널 배경 (Skin.dress가 비트맵으로 교체). src는 미리보기용 기본값 -->
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_bg" />
+
+    <LinearLayout
     android:id="@+id/st_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
     android:orientation="vertical"
     android:padding="14dp">
 
@@ -94,3 +106,4 @@
         <TextView android:id="@+id/st_app_time2" style="@style/StAppTime" android:layout_width="wrap_content" />
     </LinearLayout>
 </LinearLayout>
+</FrameLayout>

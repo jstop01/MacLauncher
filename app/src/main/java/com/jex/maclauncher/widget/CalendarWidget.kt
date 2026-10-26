@@ -1,6 +1,9 @@
 package com.jex.maclauncher.widget
 
 import android.app.AlarmManager
+import android.content.res.ColorStateList
+import android.os.Build
+import com.jex.maclauncher.widget.skin.Skin
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -69,7 +72,6 @@ class CalendarWidget : AppWidgetProvider() {
         private const val ACTION_MIDNIGHT = "com.jex.maclauncher.calendar.MIDNIGHT"
         private const val KEY_OFFSET = "offset_"
 
-        private const val WHITE = 0xFFFFFFFF.toInt()
         private const val EVENT = 0xFF8E8E93.toInt()
         private const val RED = 0xFFFF453A.toInt()
         private const val BLUE = 0xFF0A84FF.toInt()
@@ -101,7 +103,7 @@ class CalendarWidget : AppWidgetProvider() {
         private fun update(context: Context, manager: AppWidgetManager, id: Int) {
             val size = WidgetSize.of(manager, id)
             if (size.narrowerThan(200) || size.shorterThan(190)) {
-                manager.updateAppWidget(id, smallViews(context))
+                manager.updateAppWidget(id, Skin.dress(context, smallViews(context), size))
                 return
             }
             val today = Calendar.getInstance()
@@ -117,13 +119,15 @@ class CalendarWidget : AppWidgetProvider() {
             val rows = (lead + month.getActualMaximum(Calendar.DAY_OF_MONTH) + 6) / 7
             val day = (month.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -lead) }
             val p = WidgetTheme.palette(context)
+            val pack = Skin.current(context)
+            val onToday = Skin.onAccent(pack)
             val busy = CalendarEvents.daysWithEvents(context, month)
             DAYS.forEachIndexed { i, cell ->
                 val inMonth = day.get(Calendar.MONTH) == month.get(Calendar.MONTH)
                 val isToday = day.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                     day.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
                 val color = when {
-                    isToday -> WHITE   // 파란 박스 위
+                    isToday -> onToday   // 강조색 박스 위
                     !inMonth -> p.dim
                     i % 7 == 0 -> RED
                     i % 7 == 6 -> BLUE
@@ -131,9 +135,13 @@ class CalendarWidget : AppWidgetProvider() {
                 }
                 // 일정 있는 날은 숫자 아래 작은 점 (모든 칸이 두 줄이라 숫자 위치가 같음)
                 val hasEvent = inMonth && day.get(Calendar.DAY_OF_MONTH) in busy
-                views.setTextViewText(cell, dayLabel(day.get(Calendar.DAY_OF_MONTH), hasEvent, if (isToday) WHITE else EVENT))
+                views.setTextViewText(cell, dayLabel(day.get(Calendar.DAY_OF_MONTH), hasEvent, if (isToday) onToday else EVENT))
                 views.setTextColor(cell, color)
                 views.setInt(cell, "setBackgroundResource", if (isToday) R.drawable.cal_today else 0)
+                // 오늘 박스를 팩 강조색으로 (배경 틴트는 Android 12부터 RemoteViews로 바꿀 수 있음)
+                if (isToday && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    views.setColorStateList(cell, "setBackgroundTintList", ColorStateList.valueOf(pack.accent))
+                }
                 day.add(Calendar.DAY_OF_MONTH, 1)
             }
             ROWS.forEachIndexed { r, row -> views.setViewVisibility(row, if (r < rows) View.VISIBLE else View.GONE) }
@@ -142,7 +150,7 @@ class CalendarWidget : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.cal_next, action(context, id, ACTION_NEXT, 1))
             views.setOnClickPendingIntent(R.id.cal_title, action(context, id, ACTION_TODAY, 2))
             views.setOnClickPendingIntent(R.id.cal_grid, openCalendarApp(context))
-            manager.updateAppWidget(id, views)
+            manager.updateAppWidget(id, Skin.dress(context, views, WidgetSize.of(manager, id)))
         }
 
         /** "13\n•" : 날짜 아래 작은 점 (없으면 같은 높이의 빈 줄) */

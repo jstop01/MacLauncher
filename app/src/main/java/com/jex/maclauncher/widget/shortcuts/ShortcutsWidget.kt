@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.shortcuts
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -65,7 +66,7 @@ class ShortcutsWidget : AppWidgetProvider() {
         fun updateAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             manager.getAppWidgetIds(ComponentName(context, ShortcutsWidget::class.java)).forEach { id ->
-                manager.updateAppWidget(id, views(context, id, WidgetSize.of(manager, id)))
+                WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(context, views(context, id, size), size)) }
             }
         }
 

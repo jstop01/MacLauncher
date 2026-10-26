@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.app.usage.StorageStatsManager
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -76,7 +77,7 @@ class StorageWidget : AppWidgetProvider() {
                     val ids = manager.getAppWidgetIds(ComponentName(app, StorageWidget::class.java))
                     if (ids.isNotEmpty()) {
                         val usage = measure(app)
-                        ids.forEach { id -> manager.updateAppWidget(id, views(app, usage, WidgetSize.of(manager, id))) }
+                        ids.forEach { id -> WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(app, views(app, usage, size), size)) } }
                     }
                 } finally {
                     pending?.finish()

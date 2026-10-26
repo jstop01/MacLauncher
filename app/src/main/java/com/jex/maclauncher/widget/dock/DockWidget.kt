@@ -1,6 +1,8 @@
 package com.jex.maclauncher.widget.dock
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.WidgetSize
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -130,7 +132,7 @@ class DockWidget : AppWidgetProvider() {
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
                 ),
             )
-            manager.updateAppWidget(id, views)
+            manager.updateAppWidget(id, Skin.dress(context, views, WidgetSize.of(manager, id), macDark = R.drawable.dock_bg, macLight = R.drawable.dock_bg_light))
         }
     }
 }

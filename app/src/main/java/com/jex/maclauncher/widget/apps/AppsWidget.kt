@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.apps
 
 import android.app.Activity
+import com.jex.maclauncher.widget.skin.Skin
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -92,7 +93,7 @@ class AppsWidget : AppWidgetProvider() {
                     PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
                 ),
             )
-            manager.updateAppWidget(id, views)
+            manager.updateAppWidget(id, Skin.dress(context, views, WidgetSize.of(manager, id)))
             manager.notifyAppWidgetViewDataChanged(id, R.id.apps_grid)
         }
 

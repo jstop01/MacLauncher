@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget
 
 import android.app.AlarmManager
+import com.jex.maclauncher.widget.skin.Skin
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -118,7 +119,8 @@ class TimerWidget : AppWidgetProvider() {
         fun updateAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, TimerWidget::class.java))
-            if (ids.isNotEmpty()) manager.updateAppWidget(ids, views(context))
+            // 위젯마다 크기가 달라 패널 배경도 따로
+            ids.forEach { id -> manager.updateAppWidget(id, Skin.dress(context, views(context), WidgetSize.of(manager, id))) }
         }
 
         private fun views(context: Context): RemoteViews {

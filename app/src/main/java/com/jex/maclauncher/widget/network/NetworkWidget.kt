@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget.network
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -47,7 +48,7 @@ class NetworkWidget : AppWidgetProvider() {
             if (ids.isEmpty()) return
             val manager = AppWidgetManager.getInstance(context)
             val today = NetworkStats.today(context)
-            ids.forEach { id -> manager.updateAppWidget(id, views(context, WidgetSize.of(manager, id), today)) }
+            ids.forEach { id -> WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(context, views(context, size, today), size)) } }
         }
 
         private fun views(context: Context, size: WidgetSize, today: Pair<Long, Long>?): RemoteViews {

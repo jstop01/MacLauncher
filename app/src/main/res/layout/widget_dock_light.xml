@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- tools/gen_light_widgets.py 가 만든 파일. 직접 고치지 말 것 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 감성 팩 패널 배경 (Skin.dress). src는 미리보기용 기본값 -->
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/dock_bg_light" />
+
+    <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/dock_bg_light"
     android:paddingHorizontal="10dp"
     android:paddingVertical="6dp">
 
@@ -24,4 +36,5 @@
         android:textColor="#CC1C1C1E"
         android:textSize="13sp"
         android:visibility="gone" />
+</FrameLayout>
 </FrameLayout>

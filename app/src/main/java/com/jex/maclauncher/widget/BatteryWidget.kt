@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget
 
 import android.Manifest
+import com.jex.maclauncher.widget.skin.Skin
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -55,7 +56,7 @@ class BatteryWidget : AppWidgetProvider() {
             val ids = manager.getAppWidgetIds(ComponentName(context, BatteryWidget::class.java))
             if (ids.isEmpty()) return
             val batteries = listOf(phone(context)) + bluetooth(context)
-            ids.forEach { id -> manager.updateAppWidget(id, views(context, batteries, WidgetSize.of(manager, id))) }
+            ids.forEach { id -> WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(context, views(context, batteries, size), size)) } }
         }
 
         private fun views(context: Context, batteries: List<Battery>, size: WidgetSize): RemoteViews {

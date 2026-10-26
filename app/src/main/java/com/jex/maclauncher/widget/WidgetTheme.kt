@@ -74,7 +74,8 @@ object WidgetTheme {
         WidgetRefresher.all(context)
     }
 
-    fun palette(context: Context) = if (isLight(context)) LIGHT else DARK
+    /** 코드로 그리는 색. 감성 팩마다 다름 (맥 다크/라이트면 DARK/LIGHT 그대로) */
+    fun palette(context: Context) = com.jex.maclauncher.widget.skin.Skin.current(context).palette
 
     /** 다크 레이아웃 id → 현재 테마의 레이아웃 id */
     fun layout(context: Context, dark: Int): Int = if (isLight(context)) LIGHT_LAYOUTS[dark] ?: dark else dark

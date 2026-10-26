@@ -1,6 +1,8 @@
 package com.jex.maclauncher.widget.reminders
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.WidgetSize
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -26,7 +28,7 @@ class RemindersWidget : AppWidgetProvider() {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, RemindersWidget::class.java))
             ids.forEach { id ->
-                manager.updateAppWidget(id, views(context, id))
+                manager.updateAppWidget(id, Skin.dress(context, views(context, id), WidgetSize.of(manager, id)))
                 manager.notifyAppWidgetViewDataChanged(id, R.id.rem_list)
             }
         }
@@ -34,6 +36,10 @@ class RemindersWidget : AppWidgetProvider() {
         private fun views(context: Context, id: Int): RemoteViews =
             RemoteViews(context.packageName, WidgetTheme.layout(context, R.layout.widget_reminders)).apply {
                 setTextViewText(R.id.rem_count, ReminderStore.remaining(context).toString())
+                val accent = Skin.current(context).accent
+                setTextColor(R.id.rem_count, accent)
+                setTextColor(R.id.rem_add, accent)
+                setTextColor(R.id.rem_clear, (accent and 0x00FFFFFF) or (0x99 shl 24))
 
                 val done = ReminderStore.completed(context)
                 setViewVisibility(R.id.rem_clear, if (done > 0) View.VISIBLE else View.GONE)

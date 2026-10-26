@@ -502,7 +502,7 @@ private fun SkinPicker() {
         Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(16.dp)).padding(18.dp),
     ) {
         Text("위젯 감성", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-        Text("홈 화면 위젯의 감성을 골라요. 바꾸면 바로 적용돼요. (지금은 날씨·시계가 감성을 따르고, 점점 넓혀가요)", color = Sub, fontSize = 13.sp)
+        Text("홈 화면 위젯의 감성을 골라요. 바꾸면 바로 적용돼요. (배경·그래프·강조색이 함께 바뀌어요)", color = Sub, fontSize = 13.sp)
         Spacer(Modifier.height(14.dp))
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             Skin.BUILTIN.forEachIndexed { i, pack ->

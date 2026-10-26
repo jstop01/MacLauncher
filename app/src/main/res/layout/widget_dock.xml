@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 감성 팩 패널 배경 (Skin.dress). src는 미리보기용 기본값 -->
+    <ImageView
+        android:id="@+id/skin_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/dock_bg" />
+
+    <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/dock_bg"
     android:paddingHorizontal="10dp"
     android:paddingVertical="6dp">
 
@@ -23,4 +35,5 @@
         android:textColor="#CCFFFFFF"
         android:textSize="13sp"
         android:visibility="gone" />
+</FrameLayout>
 </FrameLayout>

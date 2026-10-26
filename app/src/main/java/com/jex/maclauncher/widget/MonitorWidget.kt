@@ -1,6 +1,7 @@
 package com.jex.maclauncher.widget
 
 import android.app.PendingIntent
+import com.jex.maclauncher.widget.skin.Skin
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -36,14 +37,13 @@ class MonitorWidget : AppWidgetProvider() {
     }
 
     companion object {
-        private const val BLUE = 0xFF0A84FF.toInt()
         private const val GREEN = 0xFF30D158.toInt()
 
         fun hasWidgets(context: Context): Boolean = ids(context).isNotEmpty()
 
         fun updateAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            ids(context).forEach { id -> manager.updateAppWidget(id, views(context, WidgetSize.of(manager, id))) }
+            ids(context).forEach { id -> WidgetSize.of(manager, id).let { size -> manager.updateAppWidget(id, Skin.dress(context, views(context, size), size)) } }
         }
 
         private fun ids(context: Context): IntArray =
@@ -53,14 +53,15 @@ class MonitorWidget : AppWidgetProvider() {
         private fun views(context: Context, size: WidgetSize): RemoteViews {
             val s = MonitorService.state
             val p = WidgetTheme.palette(context)
+            val accent = Skin.current(context).accent
             val small = size.narrowerThan(200) || size.shorterThan(160)
             val layout = if (small) WidgetTheme.layout(context, R.layout.widget_monitor_small) else WidgetTheme.layout(context, R.layout.widget_monitor)
             return RemoteViews(context.packageName, layout).apply {
-                setImageViewBitmap(R.id.mon_cpu_ring, MonitorGraphics.ring(s.cpu, BLUE, p.track))
+                setImageViewBitmap(R.id.mon_cpu_ring, MonitorGraphics.ring(s.cpu, accent, p.track))
                 setTextViewText(R.id.mon_cpu_value, "${(s.cpu * 100).roundToInt()}%")
                 setTextViewText(R.id.mon_mem_value, formatMemory(s.mem.usedMb))
                 if (!small) {
-                    setImageViewBitmap(R.id.mon_cpu_graph, MonitorGraphics.graph(s.cpuHistory, MonitorService.HISTORY, BLUE, p.grid))
+                    setImageViewBitmap(R.id.mon_cpu_graph, MonitorGraphics.graph(s.cpuHistory, MonitorService.HISTORY, accent, p.grid))
                     setImageViewBitmap(R.id.mon_mem_graph, MonitorGraphics.graph(s.memHistory, MonitorService.HISTORY, GREEN, p.grid))
                 }
 
