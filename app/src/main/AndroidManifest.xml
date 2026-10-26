@@ -44,6 +44,11 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
+        <!-- 최근 사용 앱·스크린 타임: 홈 런처는 목록에서 빼려고 찾아 둠 (One UI 홈은 LAUNCHER 카테고리가 없음) -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.HOME" />
+        </intent>
         <!-- 시스템 모니터/저장 공간 위젯 → 삼성 디바이스 케어 화면 찾기 -->
         <package android:name="com.samsung.android.lool" />
         <intent>

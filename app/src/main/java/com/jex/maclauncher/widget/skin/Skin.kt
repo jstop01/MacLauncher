@@ -132,8 +132,47 @@ object Skin {
         cornerRadiusDp = 24f,
     )
 
+    /** 모노: 순수 검정 + 흰 강조. OLED에서 배경과 하나로 녹는 미니멀. */
+    val MONO = SkinPack(
+        id = "mono",
+        name = "모노",
+        tier = Tier.FREE,
+        isLight = false,
+        palette = WidgetTheme.DARK.copy(subText = 0x8CFFFFFF.toInt(), track = 0xFF262626.toInt(), panel = 0xFF000000.toInt()),
+        accent = 0xFFFFFFFF.toInt(),
+        panel = PanelStyle.Solid(color = 0xF5000000.toInt(), stroke = 0x26FFFFFF),
+        icon = IconStyle(),
+        cornerRadiusDp = 20f,
+    )
+
+    /** Y2K 실버: 은빛 크롬 그라데이션 + 핫핑크. 밝은 배경이라 어두운 글씨. (프리미엄) */
+    val Y2K = SkinPack(
+        id = "y2k",
+        name = "Y2K 실버",
+        tier = Tier.PREMIUM,
+        isLight = true,
+        palette = onPastel(0xFFD9DCE3.toInt()),
+        accent = 0xFFFF2E93.toInt(),
+        panel = PanelStyle.Gradient(from = 0xFFF5F7FA.toInt(), to = 0xFFB8C0CC.toInt(), angleDeg = 90f, stroke = 0x33FFFFFF),
+        icon = IconStyle(),
+        cornerRadiusDp = 26f,
+    )
+
+    /** 말차: 부드러운 녹차 크림→말차 그린. (프리미엄) */
+    val MATCHA = SkinPack(
+        id = "matcha",
+        name = "말차",
+        tier = Tier.PREMIUM,
+        isLight = true,
+        palette = onPastel(0xFFC5D8A4.toInt()),
+        accent = 0xFF4E7D2F.toInt(),
+        panel = PanelStyle.Gradient(from = 0xFFF1F5E1.toInt(), to = 0xFFB5CC8E.toInt(), angleDeg = 90f, stroke = 0x1A000000),
+        icon = IconStyle(),
+        cornerRadiusDp = 24f,
+    )
+
     /** 피커에 보이는 순서: 무료 먼저, 프리미엄은 해금 전엔 자물쇠 */
-    val BUILTIN = listOf(MAC_DARK, MAC_LIGHT, SUNSET, MIDNIGHT, OCEAN_GLASS, BUBBLEGUM, FOREST, LAVENDER)
+    val BUILTIN = listOf(MAC_DARK, MAC_LIGHT, SUNSET, MIDNIGHT, MONO, OCEAN_GLASS, BUBBLEGUM, FOREST, LAVENDER, Y2K, MATCHA)
 
     fun byId(id: String): SkinPack? = BUILTIN.firstOrNull { it.id == id }
 
