@@ -3,7 +3,7 @@
 안드로이드(갤럭시 One UI 기준) 홈 화면에 놓는 **macOS 스타일 위젯 모음**입니다.
 시스템 모니터, 달력, Finder, Dock, 저장 공간, 미리 알림, 배터리 등 17종을 맥 다크·라이트와 여러 **감성 팩**으로 꾸밀 수 있어요.
 
-<!-- 스크린샷: docs/ -->
+<p align="center"><img src="docs/skins.png" width="720" alt="감성 팩별 미리 알림·Finder 위젯"></p>
 
 > Apple, macOS, Finder는 Apple Inc.의 상표입니다. 이 프로젝트는 Apple과 관련 없는 개인 프로젝트이며, Apple의 이미지나 코드를 쓰지 않았습니다.
 
